@@ -1,0 +1,23 @@
+version: "3.9"
+
+volumes:
+  postgres:
+
+services:
+  postgres:
+    container_name: evotingapp-db
+    image: postgres:15.2-alpine3.17
+    environment:
+      POSTGRES_DB: evotingapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: evotingapp
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "evotingapp", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
