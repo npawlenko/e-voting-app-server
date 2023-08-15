@@ -1,4 +1,11 @@
+server:
+  port: 8080
+  environment: DEVELOPMENT
+
 spring:
+  graphql:
+    graphiql:
+      enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/evotingapp
     username: postgres

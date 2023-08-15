@@ -1,0 +1,57 @@
+scalar LocalDateTime
+
+type Query {
+    polls: [Poll]
+}
+
+type Mutation {
+    createPoll(poll: PollInput): Poll
+}
+
+
+
+
+
+type Poll {
+    id: ID!
+    question: String!
+    createdAt: LocalDateTime
+    expiresAt: LocalDateTime!
+    creator: User
+    pollAnswers: [PollAnswer]
+    votes: [Vote]
+}
+
+input PollInput {
+    question: String!
+    expiresAt: LocalDateTime!
+}
+
+type PollAnswer {
+    id: ID!
+    answer: String!
+}
+
+type Role {
+    id: ID!
+    name: String!
+}
+
+type User {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    role: Role
+    polls: [Poll]
+    votes: [Vote]
+}
+
+type Vote {
+    id: ID!
+    castedAt: LocalDateTime
+    poll: Poll
+    answer: PollAnswer
+    voter: User
+}
