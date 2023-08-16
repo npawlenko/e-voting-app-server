@@ -1,4 +1,4 @@
-package com.github.npawlenko.evotingapp.security.auth;
+package com.github.npawlenko.evotingapp.security.auth.aspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
