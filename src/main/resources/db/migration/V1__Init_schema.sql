@@ -10,7 +10,7 @@ create table if not exists users
     first_name VARCHAR(64) NOT NULL,
     last_name VARCHAR(64) NOT NULL,
     email VARCHAR(64) NOT NULL UNIQUE,
-    password VARCHAR(128) NOT NULL, --sha512
+    password VARCHAR(128) NOT NULL,
     role_id INTEGER REFERENCES roles(id) NOT NULL
 );
 comment on column users.password is 'hashed with SHA512';
