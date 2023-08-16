@@ -51,6 +51,8 @@ public class User implements UserDetails {
     private List<Poll> polls;
     @OneToMany(mappedBy = "voter")
     private List<Vote> votes;
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 
     public String getFullName() {
         return String.format("%s %s", firstName, lastName).trim();
