@@ -1,4 +1,4 @@
-package com.github.npawlenko.evotingapp.aspect.authorization;
+package com.github.npawlenko.evotingapp.security.auth;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -21,7 +21,7 @@ public class AuthorizationAspect {
     @Pointcut("queryMapping() || mutationMapping()")
     public void graphQlMapping() {}
 
-    @Pointcut("@annotation(com.github.npawlenko.evotingapp.aspect.authorization.PublicEndpoint)")
+    @Pointcut("@annotation(com.github.npawlenko.evotingapp.security.auth.PublicEndpoint)")
     public void publicEndpoint() {}
 
 
