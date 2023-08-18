@@ -56,6 +56,7 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .anonymous().disable()
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/graphql").permitAll();
                     if (Environment.DEVELOPMENT.value().equalsIgnoreCase(environment))
