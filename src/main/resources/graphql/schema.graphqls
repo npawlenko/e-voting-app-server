@@ -5,13 +5,44 @@ type Query {
 }
 
 type Mutation {
+    login(data: UserLoginInput): Token
+    register(data: UserRegisterInput): Token
     createPoll(poll: PollInput): Poll
 }
 
+#----------------------------#
+# Inputs
+#----------------------------#
+input PollInput {
+    question: String!
+    expiresAt: LocalDateTime!
+}
 
+input UserLoginInput {
+    email: String!
+    password: String!
+}
 
+input UserRegisterInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+}
+# end of inputs
 
+#----------------------------#
+# Special types
+#----------------------------#
+type Token {
+    accessToken: String!
+    refreshToken: String!
+}
+# end of special types
 
+#----------------------------#
+# Types
+#----------------------------#
 type Poll {
     id: ID!
     question: String!
@@ -20,11 +51,6 @@ type Poll {
     creator: User
     pollAnswers: [PollAnswer]
     votes: [Vote]
-}
-
-input PollInput {
-    question: String!
-    expiresAt: LocalDateTime!
 }
 
 type PollAnswer {
@@ -55,3 +81,4 @@ type Vote {
     answer: PollAnswer
     voter: User
 }
+# end of types

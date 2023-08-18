@@ -2,6 +2,7 @@ package com.github.npawlenko.evotingapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "roles")
@@ -10,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
+public class Role implements GrantedAuthority {
 
     @Id
     @SequenceGenerator(
@@ -26,4 +27,9 @@ public class Role {
     @Column(name = "name")
     @Enumerated(EnumType.STRING)
     private RoleType role;
+
+    @Override
+    public String getAuthority() {
+        return role.name();
+    }
 }
