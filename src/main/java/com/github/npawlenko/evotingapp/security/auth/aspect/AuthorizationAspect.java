@@ -1,6 +1,5 @@
 package com.github.npawlenko.evotingapp.security.auth.aspect;
 
-import com.github.npawlenko.evotingapp.model.Token;
 import com.github.npawlenko.evotingapp.security.JwtService;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,29 +52,30 @@ public class AuthorizationAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            String authorizationHeader = request.getHeader("Authorization");
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
-                throw new RuntimeException();
-            String token = authorizationHeader.substring(authorizationHeader.lastIndexOf("Bearer "));
+        if(authentication != null)
+            return joinPoint.proceed();
 
-            Jwt decodedToken = jwtService.decodeJwt(token);
-            tokenRepository.findByAccessToken(token).orElseThrow();
-            UserDetails userDetails = userDetailsService.loadUserByUsername(decodedToken.getSubject());
-            if (!userDetails.getUsername().equals(decodedToken.getSubject()))
-                throw new RuntimeException();
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
+            throw new RuntimeException();
+        String token = authorizationHeader.substring(authorizationHeader.lastIndexOf("Bearer "));
+
+        Jwt decodedToken = jwtService.decodeJwt(token);
+        tokenRepository.findByAccessToken(token).orElseThrow();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(decodedToken.getSubject());
+        if (!userDetails.getUsername().equals(decodedToken.getSubject()))
+            throw new RuntimeException();
 
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
-            authToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        }
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
+        );
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         return joinPoint.proceed();
     }
