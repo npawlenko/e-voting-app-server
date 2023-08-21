@@ -1,15 +1,17 @@
 package com.github.npawlenko.evotingapp.security.auth;
 
+import com.github.npawlenko.evotingapp.exception.ApiRequestException;
 import com.github.npawlenko.evotingapp.model.Token;
+import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.security.JwtService;
 import com.github.npawlenko.evotingapp.security.auth.dto.LoginRequest;
 import com.github.npawlenko.evotingapp.security.auth.dto.RegisterRequest;
 import com.github.npawlenko.evotingapp.security.auth.dto.TokenResponse;
-import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.token.TokenMapper;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
 import com.github.npawlenko.evotingapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,7 +42,7 @@ public class AuthService {
                 )
         );
         User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new ApiRequestException("Invalid login credentials", HttpStatus.UNAUTHORIZED));
 
         Jwt accessToken = jwtService.generateJwtAccessToken(user);
         Jwt refreshToken = jwtService.generateJwtRefreshToken(user);
@@ -59,7 +61,7 @@ public class AuthService {
 
     public TokenResponse register(RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent())
-            throw new RuntimeException();
+            throw new ApiRequestException("The user with provided email already exists", HttpStatus.CONFLICT);
 
         String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
         User user = userRepository.save(User.builder()
