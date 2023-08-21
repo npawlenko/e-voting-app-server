@@ -33,8 +33,8 @@ public class UserGroup {
     @ManyToMany
     @JoinTable(
             name = "user_group_association",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> users;
 }
