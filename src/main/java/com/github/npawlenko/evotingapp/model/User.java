@@ -53,6 +53,10 @@ public class User implements UserDetails {
     private List<Vote> votes;
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
+    @OneToMany(mappedBy = "owner")
+    private List<UserGroup> ownedGroups;
+    @ManyToMany(mappedBy = "users")
+    private List<UserGroup> memberOfGroups;
 
     public String getFullName() {
         return String.format("%s %s", firstName, lastName).trim();

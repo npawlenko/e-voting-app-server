@@ -32,9 +32,11 @@ public class Poll {
     @Column(name = "created_at")
     @NotBlank
     private LocalDateTime createdAt;
-    @Column(name = "expiresAt")
+    @Column(name = "closes_at")
     @NotBlank
-    private LocalDateTime expiresAt;
+    private LocalDateTime closesAt;
+    @Column(name = "is_public")
+    private boolean isPublic;
 
 
     @ManyToOne
@@ -44,4 +46,7 @@ public class Poll {
     private List<PollAnswer> pollAnswers;
     @OneToMany(mappedBy = "poll")
     private List<Vote> votes;
+    @ManyToOne
+    @JoinColumn(name = "user_group_id", referencedColumnName = "id")
+    private UserGroup userGroup;
 }
