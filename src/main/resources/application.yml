@@ -1,16 +1,11 @@
-server:
-  port: 8080
-  environment: DEVELOPMENT
-
 application:
   jwt:
     access-token-expiration-seconds: 3600
     refresh-token-expiration-seconds: 7200
 
 spring:
-  graphql:
-    graphiql:
-      enabled: true
+  profiles:
+    active: prod
   datasource:
     url: jdbc:postgresql://localhost:5432/evotingapp
     username: postgres

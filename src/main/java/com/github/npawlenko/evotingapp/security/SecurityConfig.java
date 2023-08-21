@@ -1,6 +1,5 @@
 package com.github.npawlenko.evotingapp.security;
 
-import com.github.npawlenko.evotingapp.Environment;
 import com.github.npawlenko.evotingapp.utils.RSAKeyStorage;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -35,8 +34,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${server.environment}")
-    private String environment;
     private final RSAKeyStorage keyStorage;
 
     @Bean
@@ -59,8 +56,7 @@ public class SecurityConfig {
                 .anonymous().disable()
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/graphql").permitAll();
-                    if (Environment.DEVELOPMENT.value().equalsIgnoreCase(environment))
-                        auth.requestMatchers("/graphiql").permitAll();
+                    auth.requestMatchers("/graphiql").permitAll();
 
                     auth.anyRequest().denyAll();
                 })
