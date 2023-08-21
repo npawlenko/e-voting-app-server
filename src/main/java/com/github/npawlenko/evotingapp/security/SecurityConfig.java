@@ -1,7 +1,7 @@
 package com.github.npawlenko.evotingapp.security;
 
 import com.github.npawlenko.evotingapp.Environment;
-import com.github.npawlenko.evotingapp.utils.RSAKeyProperties;
+import com.github.npawlenko.evotingapp.utils.RSAKeyStorage;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -37,7 +37,7 @@ public class SecurityConfig {
 
     @Value("${server.environment}")
     private String environment;
-    private final RSAKeyProperties keys;
+    private final RSAKeyStorage keyStorage;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -70,12 +70,12 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(keys.getPublicKey()).build();
+        return NimbusJwtDecoder.withPublicKey(keyStorage.getPublicKey()).build();
     }
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(keys.getPublicKey()).privateKey(keys.getPrivateKey()).build();
+        JWK jwk = new RSAKey.Builder(keyStorage.getPublicKey()).privateKey(keyStorage.getPrivateKey()).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
