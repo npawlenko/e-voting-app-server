@@ -29,5 +29,5 @@ spring:
     baseline-on-migrate: true
     user: postgres
     password: evotingapp
-    baseline-description: "Add polls is_public field"
-    baseline-version: 1.4
+    baseline-description: "Add groups"
+    baseline-version: 1.5

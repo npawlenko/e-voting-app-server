@@ -46,4 +46,7 @@ public class Poll {
     private List<PollAnswer> pollAnswers;
     @OneToMany(mappedBy = "poll")
     private List<Vote> votes;
+    @ManyToOne
+    @JoinColumn(name = "user_group_id", referencedColumnName = "id")
+    private UserGroup userGroup;
 }
