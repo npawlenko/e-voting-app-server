@@ -30,4 +30,4 @@ spring:
     user: postgres
     password: evotingapp
     baseline-description: "Add groups"
-    baseline-version: 1.5
+    baseline-version: 1.6

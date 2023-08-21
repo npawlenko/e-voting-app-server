@@ -1,2 +1,0 @@
-ALTER TABLE polls
-ADD COLUMN is_public BOOLEAN NOT NULL;

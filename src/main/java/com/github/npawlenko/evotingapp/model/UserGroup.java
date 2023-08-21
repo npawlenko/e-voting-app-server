@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserGroup {
 
+    @Id
     @SequenceGenerator(
             name = "user_groups_id_generator",
             sequenceName = "users_id_seq",

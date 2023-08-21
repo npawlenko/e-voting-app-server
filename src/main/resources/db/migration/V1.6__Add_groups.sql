@@ -11,4 +11,4 @@ create table if not exists user_group_association (
 );
 
 alter table polls
-add column user_group_id integer not null references user_groups(id);
+add column user_group_id integer references user_groups(id) on delete set null;
