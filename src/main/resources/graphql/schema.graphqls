@@ -47,7 +47,7 @@ type Poll {
     id: ID!
     question: String!
     createdAt: LocalDateTime
-    expiresAt: LocalDateTime!
+    closesAt: LocalDateTime!
     creator: User
     pollAnswers: [PollAnswer]
     votes: [Vote]

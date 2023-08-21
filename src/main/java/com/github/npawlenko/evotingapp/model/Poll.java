@@ -32,9 +32,9 @@ public class Poll {
     @Column(name = "created_at")
     @NotBlank
     private LocalDateTime createdAt;
-    @Column(name = "expiresAt")
+    @Column(name = "closes_at")
     @NotBlank
-    private LocalDateTime expiresAt;
+    private LocalDateTime closesAt;
 
 
     @ManyToOne
