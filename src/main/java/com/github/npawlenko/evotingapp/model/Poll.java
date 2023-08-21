@@ -35,6 +35,8 @@ public class Poll {
     @Column(name = "closes_at")
     @NotBlank
     private LocalDateTime closesAt;
+    @Column(name = "is_public")
+    private boolean isPublic;
 
 
     @ManyToOne
