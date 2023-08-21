@@ -48,11 +48,7 @@ public class JwtService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
     }
 
-    public Jwt decodeJwt(String token) {
-        try {
-            return jwtDecoder.decode(token);
-        } catch(JwtException e) {
-            throw new RuntimeException(e);
-        }
+    public Jwt decodeJwt(String token) throws JwtException {
+        return jwtDecoder.decode(token);
     }
 }
