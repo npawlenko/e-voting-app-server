@@ -28,7 +28,7 @@ public class JwtService {
     }
 
     public Jwt generateJwtRefreshToken(User user) {
-       return generateJwt(user, refreshTokenExpiration);
+        return generateJwt(user, refreshTokenExpiration);
     }
 
     private Jwt generateJwt(User user, long expiration) {
@@ -38,7 +38,6 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
-                .issuer("self")
                 .issuedAt(now)
                 .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
                 .subject(user.getEmail())
