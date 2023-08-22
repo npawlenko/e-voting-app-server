@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +23,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Instant;
+
+import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.*;
 
 @Aspect
 @Component
@@ -65,18 +66,18 @@ public class AuthorizationAspect {
         try {
             Jwt decodedToken = jwtService.decodeJwt(token);
             if (isTokenExpired(decodedToken)) {
-                throw new ApiRequestException("Expired token", HttpStatus.UNAUTHORIZED);
+                throw new ApiRequestException(TOKEN_EXPIRED);
             }
 
             tokenRepository.findByAccessToken(token).
-                    orElseThrow(() -> new ApiRequestException("Authentication error", HttpStatus.UNAUTHORIZED));
+                    orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
             UserDetails userDetails = userDetailsService.loadUserByUsername(decodedToken.getSubject());
             if (!userDetails.getUsername().equals(decodedToken.getSubject())) {
-                throw new ApiRequestException("Authentication error", HttpStatus.UNAUTHORIZED);
+                throw new ApiRequestException(AUTHENTICATION_ERROR);
             }
             authenticateUser(request, userDetails);
         } catch (JwtException e) {
-            throw new ApiRequestException("Invalid token", HttpStatus.UNAUTHORIZED);
+            throw new ApiRequestException(TOKEN_INVALID);
         }
 
         return joinPoint.proceed();
@@ -91,7 +92,7 @@ public class AuthorizationAspect {
     private String getAuthorizationToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new ApiRequestException("Missing token", HttpStatus.UNAUTHORIZED);
+            throw new ApiRequestException(TOKEN_MISSING);
         }
         return authorizationHeader.substring(authorizationHeader.lastIndexOf("Bearer "));
     }
