@@ -1,0 +1,11 @@
+error:
+  token:
+    invalid: Token jest nieprawidłowy
+    missing: Nie wprowadzono tokena
+    expired: Token stracił ważność
+  user:
+    invalidCredentials: Wprowadzone dane logowania są nieprawidłowe!
+    conflict:
+      email: Użytkownik z wprowadzonym adresem email już istnieje!
+  unknown:
+    authentication: Wystąpił nieznany błąd uwierzytelniania
