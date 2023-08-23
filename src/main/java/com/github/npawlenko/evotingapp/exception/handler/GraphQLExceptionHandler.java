@@ -1,5 +1,7 @@
-package com.github.npawlenko.evotingapp.exception;
+package com.github.npawlenko.evotingapp.exception.handler;
 
+import com.github.npawlenko.evotingapp.exception.ApiRequestException;
+import com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason;
 import com.github.npawlenko.evotingapp.utils.MessageUtility;
 import graphql.ErrorType;
 import graphql.GraphQLError;
