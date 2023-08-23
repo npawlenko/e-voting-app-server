@@ -8,6 +8,7 @@ import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
     private final MessageUtility messageUtility;
@@ -37,6 +39,7 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
                     .build();
         }
 
+        log.error("Caught unknown error", ex);
         return GraphqlErrorBuilder.newError(env)
                 .message(ex.getMessage())
                 .errorType(ErrorType.DataFetchingException)
