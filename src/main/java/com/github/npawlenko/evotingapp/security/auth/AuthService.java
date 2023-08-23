@@ -1,8 +1,11 @@
 package com.github.npawlenko.evotingapp.security.auth;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
+import com.github.npawlenko.evotingapp.model.Role;
+import com.github.npawlenko.evotingapp.model.RoleType;
 import com.github.npawlenko.evotingapp.model.Token;
 import com.github.npawlenko.evotingapp.model.User;
+import com.github.npawlenko.evotingapp.role.RoleRepository;
 import com.github.npawlenko.evotingapp.security.JwtService;
 import com.github.npawlenko.evotingapp.security.auth.dto.LoginRequest;
 import com.github.npawlenko.evotingapp.security.auth.dto.RegisterRequest;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
@@ -31,6 +35,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenMapper tokenMapper;
     private final TokenRepository tokenRepository;
@@ -65,12 +70,16 @@ public class AuthService {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent())
             throw new ApiRequestException(USER_EMAIL_ALREADY_EXISTS);
 
+        Role userRole = roleRepository.findByRole(RoleType.USER)
+                .orElseThrow();
+
         String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
         User user = userRepository.save(User.builder()
                 .email(registerRequest.getEmail())
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .password(encodedPassword)
+                .role(userRole)
                 .build()
         );
         Jwt accessToken = jwtService.generateJwtAccessToken(user);
@@ -78,12 +87,18 @@ public class AuthService {
         Token token = Token.builder()
                 .accessToken(accessToken.getTokenValue())
                 .refreshToken(refreshToken.getTokenValue())
-                .expiresAt(LocalDateTime.from(
-                        Objects.requireNonNull(refreshToken.getExpiresAt())
-                ))
+                .expiresAt(
+                        instantToLocalDateTime(
+                                Objects.requireNonNull(refreshToken.getExpiresAt())
+                        )
+                )
                 .build();
         tokenRepository.save(token);
 
         return tokenMapper.tokenToTokenResponse(token);
+    }
+
+    private LocalDateTime instantToLocalDateTime(Instant instant) {
+        return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 }
