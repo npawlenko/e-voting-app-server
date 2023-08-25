@@ -2,11 +2,13 @@ scalar LocalDateTime
 
 type Query {
     polls: [Poll]
+    userPolls: [Poll]
 }
 
 type Mutation {
     login(data: UserLoginInput): Token
     register(data: UserRegisterInput): Token
+
     createPoll(poll: PollInput): Poll
 }
 
@@ -15,7 +17,8 @@ type Mutation {
 #----------------------------#
 input PollInput {
     question: String!
-    expiresAt: LocalDateTime!
+    closesAt: LocalDateTime
+    isPublic: Boolean!
 }
 
 input UserLoginInput {
@@ -46,8 +49,9 @@ type Token {
 type Poll {
     id: ID!
     question: String!
-    createdAt: LocalDateTime
+    createdAt: LocalDateTime!
     closesAt: LocalDateTime!
+    isPublic: Boolean!
     creator: User
     pollAnswers: [PollAnswer]
     votes: [Vote]
