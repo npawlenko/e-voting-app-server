@@ -16,6 +16,5 @@ public class PollRequest {
     private String question;
     @Future
     private LocalDateTime closesAt;
-    @NotBlank
     private boolean isPublic;
 }
