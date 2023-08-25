@@ -1,8 +1,5 @@
 package com.github.npawlenko.evotingapp.poll.dto;
 
-import com.github.npawlenko.evotingapp.model.PollAnswer;
-import com.github.npawlenko.evotingapp.model.User;
-import com.github.npawlenko.evotingapp.model.Vote;
 import com.github.npawlenko.evotingapp.pollAnswer.dto.PollAnswerResponse;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
 import com.github.npawlenko.evotingapp.vote.dto.VoteResponse;
