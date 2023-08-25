@@ -8,7 +8,6 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +38,7 @@ public class JwtService {
                 .collect(Collectors.joining(" "));
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuedAt(now)
-                .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
+                .expiresAt(now.plusSeconds(expiration))
                 .subject(user.getEmail())
                 .claim("role", scope)
                 .build();

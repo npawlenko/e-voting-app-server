@@ -1,7 +1,9 @@
 package com.github.npawlenko.evotingapp.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -30,10 +32,10 @@ public class Poll {
     @NotBlank
     private String question;
     @Column(name = "created_at")
-    @NotBlank
+    @PastOrPresent
     private LocalDateTime createdAt;
     @Column(name = "closes_at")
-    @NotBlank
+    @Future
     private LocalDateTime closesAt;
     @Column(name = "is_public")
     private boolean isPublic;

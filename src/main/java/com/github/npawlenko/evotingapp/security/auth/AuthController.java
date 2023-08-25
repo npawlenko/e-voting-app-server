@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -18,13 +17,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PublicEndpoint
-    @MutationMapping(value = "login")
+    @MutationMapping("login")
     public TokenResponse login(@Valid @Argument("data") LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
     @PublicEndpoint
-    @MutationMapping(value = "register")
+    @MutationMapping("register")
     public TokenResponse register(@Valid @Argument("data") RegisterRequest registerRequest) {
         return authService.register(registerRequest);
     }

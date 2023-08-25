@@ -1,6 +1,7 @@
 package com.github.npawlenko.evotingapp.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class Vote {
     )
     private Long id;
     @Column(name = "casted_at")
+    @PastOrPresent
     private LocalDateTime castedAt;
 
     @ManyToOne

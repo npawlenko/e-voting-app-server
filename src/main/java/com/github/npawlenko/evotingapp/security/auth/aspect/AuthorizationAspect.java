@@ -5,6 +5,7 @@ import com.github.npawlenko.evotingapp.security.JwtService;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,6 +30,7 @@ import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReaso
 @Aspect
 @Component
 @EnableAspectJAutoProxy
+@Slf4j
 @RequiredArgsConstructor
 public class AuthorizationAspect {
 
@@ -65,18 +67,19 @@ public class AuthorizationAspect {
         String token = getAuthorizationToken(request);
         try {
             Jwt decodedToken = jwtService.decodeJwt(token);
-            if (isTokenExpired(decodedToken)) {
-                throw new ApiRequestException(TOKEN_EXPIRED);
-            }
 
             tokenRepository.findByAccessToken(token).
                     orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
             UserDetails userDetails = userDetailsService.loadUserByUsername(decodedToken.getSubject());
             if (!userDetails.getUsername().equals(decodedToken.getSubject())) {
+                log.error("Username does not match token subject. {} differs from {}", userDetails.getUsername(), decodedToken.getSubject());
                 throw new ApiRequestException(AUTHENTICATION_ERROR);
             }
             authenticateUser(request, userDetails);
         } catch (JwtException e) {
+
+            log.error(e.getMessage());
+            e.printStackTrace();
             throw new ApiRequestException(TOKEN_INVALID);
         }
 
@@ -85,8 +88,8 @@ public class AuthorizationAspect {
 
     private boolean isTokenExpired(Jwt decodedToken) {
         Instant expiresAt;
-        return (expiresAt = decodedToken.getExpiresAt()) != null
-                && expiresAt.isAfter(Instant.now());
+        return (expiresAt = decodedToken.getExpiresAt()) == null
+                || expiresAt.isBefore(Instant.now());
     }
 
     private String getAuthorizationToken(HttpServletRequest request) {
@@ -94,7 +97,7 @@ public class AuthorizationAspect {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new ApiRequestException(TOKEN_MISSING);
         }
-        return authorizationHeader.substring(authorizationHeader.lastIndexOf("Bearer "));
+        return authorizationHeader.substring(7);
     }
 
     private Authentication getAuthentication() {
