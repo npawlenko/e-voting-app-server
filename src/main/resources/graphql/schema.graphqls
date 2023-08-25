@@ -67,18 +67,13 @@ type User {
     id: ID!
     firstName: String!
     lastName: String!
-    email: String!
-    password: String!
     role: Role
-    polls: [Poll]
-    votes: [Vote]
 }
 
 type Vote {
     id: ID!
-    castedAt: LocalDateTime
+    castedAt: LocalDateTime!
     poll: Poll
     answer: PollAnswer
-    voter: User
 }
 # end of types
