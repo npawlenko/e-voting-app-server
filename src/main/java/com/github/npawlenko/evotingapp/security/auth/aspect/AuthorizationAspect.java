@@ -67,9 +67,6 @@ public class AuthorizationAspect {
         String token = getAuthorizationToken(request);
         try {
             Jwt decodedToken = jwtService.decodeJwt(token);
-            if (isTokenExpired(decodedToken)) {
-                throw new ApiRequestException(TOKEN_EXPIRED);
-            }
 
             tokenRepository.findByAccessToken(token).
                     orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
@@ -80,6 +77,7 @@ public class AuthorizationAspect {
             }
             authenticateUser(request, userDetails);
         } catch (JwtException e) {
+
             log.error(e.getMessage());
             e.printStackTrace();
             throw new ApiRequestException(TOKEN_INVALID);
