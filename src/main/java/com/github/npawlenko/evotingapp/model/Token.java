@@ -1,6 +1,7 @@
 package com.github.npawlenko.evotingapp.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class Token {
     @Column(name = "refresh_token", unique = true, length = 1000)
     private String refreshToken;
     @Column(name = "expires_at")
+    @Future
     private LocalDateTime expiresAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
