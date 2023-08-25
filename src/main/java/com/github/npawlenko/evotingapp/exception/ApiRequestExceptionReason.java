@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ApiRequestExceptionReason implements ExceptionWithReason {
 
+    USER_NOT_LOGGED_IN("error.user.notLoggedIn", HttpStatus.UNAUTHORIZED),
+    USER_NOT_FOUND("error.user.notFound", HttpStatus.NOT_FOUND),
     USER_CREDENTIALS_INVALID("error.user.invalidCredentials", HttpStatus.UNAUTHORIZED),
     USER_EMAIL_ALREADY_EXISTS("error.user.conflict.email", HttpStatus.CONFLICT),
 
