@@ -3,13 +3,21 @@ scalar LocalDateTime
 type Query {
     polls: [Poll]
     userPolls: [Poll]
+
+    pollAnswers(pollId: ID!): [PollAnswer]
 }
 
 type Mutation {
-    login(data: UserLoginInput): Token
-    register(data: UserRegisterInput): Token
+    login(data: UserLoginInput!): Token
+    register(data: UserRegisterInput!): Token
 
-    createPoll(poll: PollInput): Poll
+    createPoll(poll: PollInput!): Poll
+    updatePoll(pollId: ID!, poll: PollInput!): Poll
+    deletePoll(pollId: ID!): Boolean
+
+    createPollAnswer(pollId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
+    updatePollAnswer(pollAnswerId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
+    deletePollAnswer(pollAnswerId: ID!): Boolean
 }
 
 #----------------------------#
@@ -19,6 +27,10 @@ input PollInput {
     question: String!
     closesAt: LocalDateTime
     isPublic: Boolean!
+}
+
+input PollAnswerInput {
+    answer: String!
 }
 
 input UserLoginInput {

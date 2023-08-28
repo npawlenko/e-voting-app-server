@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 public enum ApiRequestExceptionReason implements ExceptionWithReason {
 
     USER_NOT_LOGGED_IN("error.user.notLoggedIn", HttpStatus.UNAUTHORIZED),
-    USER_NOT_FOUND("error.user.notFound", HttpStatus.NOT_FOUND),
     USER_CREDENTIALS_INVALID("error.user.invalidCredentials", HttpStatus.UNAUTHORIZED),
     USER_EMAIL_ALREADY_EXISTS("error.user.conflict.email", HttpStatus.CONFLICT),
+
+    NOT_FOUND("error.notFound", HttpStatus.NOT_FOUND),
+    FORBIDDEN("error.forbidden", HttpStatus.FORBIDDEN),
 
     TOKEN_MISSING("error.token.missing", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID("error.token.invalid", HttpStatus.UNAUTHORIZED),
