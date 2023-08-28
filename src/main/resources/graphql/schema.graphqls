@@ -12,6 +12,8 @@ type Mutation {
     register(data: UserRegisterInput!): Token
 
     createPoll(poll: PollInput!): Poll
+    updatePoll(pollId: ID!, poll: PollInput!): Poll
+    deletePoll(pollId: ID!): Boolean
 
     createPollAnswer(pollId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
     updatePollAnswer(pollAnswerId: ID!, pollAnswer: PollAnswerInput!): PollAnswer

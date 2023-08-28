@@ -31,4 +31,17 @@ public class PollController {
     public PollResponse createPoll(@Valid @Argument("poll") PollRequest pollRequest) {
         return pollService.createPoll(pollRequest);
     }
+
+    @MutationMapping("updatePoll")
+    public PollResponse updatePoll(
+            @Argument("pollId") Long pollId,
+            @Valid @Argument("poll") PollRequest pollRequest
+    ) {
+        return pollService.updatePoll(pollId, pollRequest);
+    }
+
+    @MutationMapping("deletePoll")
+    public void deletePoll(@Argument("pollId") Long pollId) {
+        pollService.deletePoll(pollId);
+    }
 }
