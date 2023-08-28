@@ -36,19 +36,11 @@ public class PollService {
     public PollResponse createPoll(PollRequest pollRequest) {
         User user = authenticatedUserUtility.getLoggedUser();
 
-        Poll poll = buildPollFromPollRequest(pollRequest, user);
+        Poll poll = pollMapper.pollRequestToPoll(pollRequest);
+        poll.setCreatedAt(LocalDateTime.now());
+        poll.setCreator(user);
         Poll savedPoll = pollRepository.save(poll);
 
         return pollMapper.pollToPollResponse(savedPoll);
-    }
-
-    private static Poll buildPollFromPollRequest(PollRequest pollRequest, User user) {
-        return Poll.builder()
-                .question(pollRequest.getQuestion())
-                .createdAt(LocalDateTime.now())
-                .closesAt(pollRequest.getClosesAt())
-                .isPublic(pollRequest.isPublic())
-                .creator(user)
-                .build();
     }
 }
