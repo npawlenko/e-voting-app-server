@@ -12,7 +12,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,7 +31,7 @@ import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReaso
 @EnableAspectJAutoProxy
 @Slf4j
 @RequiredArgsConstructor
-public class AuthorizationAspect {
+public class AuthenticationAspect {
 
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
@@ -59,7 +58,7 @@ public class AuthorizationAspect {
     public Object aroundNotPublicEndpoint(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = getCurrentRequest();
 
-        Authentication authentication = getAuthentication();
+        org.springframework.security.core.Authentication authentication = getAuthentication();
         if (authentication != null) {
             return joinPoint.proceed();
         }
@@ -100,7 +99,7 @@ public class AuthorizationAspect {
         return authorizationHeader.substring(7);
     }
 
-    private Authentication getAuthentication() {
+    private org.springframework.security.core.Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
