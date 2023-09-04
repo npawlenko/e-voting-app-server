@@ -3,6 +3,7 @@ package com.github.npawlenko.evotingapp.security.auth.aspect;
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
 import com.github.npawlenko.evotingapp.security.JwtService;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
+import com.github.npawlenko.evotingapp.utils.HttpUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class AuthenticationAspect {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final UserDetailsService userDetailsService;
+    private final HttpUtility httpUtility;
 
     @Pointcut("@annotation(org.springframework.graphql.data.method.annotation.QueryMapping)")
     public void queryMapping() {
@@ -56,14 +58,14 @@ public class AuthenticationAspect {
 
     @Around("graphQlMapping() && !publicEndpoint()")
     public Object aroundNotPublicEndpoint(ProceedingJoinPoint joinPoint) throws Throwable {
-        HttpServletRequest request = getCurrentRequest();
+        HttpServletRequest request = HttpUtility.getCurrentRequest();
 
         org.springframework.security.core.Authentication authentication = getAuthentication();
         if (authentication != null) {
             return joinPoint.proceed();
         }
 
-        String token = getAuthorizationToken(request);
+        String token = httpUtility.getAuthorizationToken(request);
         try {
             Jwt decodedToken = jwtService.decodeJwt(token);
 
@@ -85,26 +87,8 @@ public class AuthenticationAspect {
         return joinPoint.proceed();
     }
 
-    private boolean isTokenExpired(Jwt decodedToken) {
-        Instant expiresAt;
-        return (expiresAt = decodedToken.getExpiresAt()) == null
-                || expiresAt.isBefore(Instant.now());
-    }
-
-    private String getAuthorizationToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new ApiRequestException(TOKEN_MISSING);
-        }
-        return authorizationHeader.substring(7);
-    }
-
     private org.springframework.security.core.Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
-    }
-
-    private HttpServletRequest getCurrentRequest() {
-        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
     }
 
     private void authenticateUser(HttpServletRequest request, UserDetails userDetails) {
