@@ -1,8 +1,7 @@
 application:
   jwt:
-    access-token-expiration-seconds: 3600
-    refresh-token-expiration-seconds: 7200
-
+    access-token-expiration-seconds: 129600 #36h
+    refresh-token-expiration-seconds: 604800 #7d
 spring:
   profiles:
     active: dev
