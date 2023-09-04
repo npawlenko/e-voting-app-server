@@ -10,6 +10,8 @@ type Query {
 type Mutation {
     login(data: UserLoginInput!): Token
     register(data: UserRegisterInput!): Token
+    logout: Boolean
+    refresh: Token
 
     createPoll(poll: PollInput!): Poll
     updatePoll(pollId: ID!, poll: PollInput!): Poll
