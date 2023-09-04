@@ -4,6 +4,7 @@ import com.github.npawlenko.evotingapp.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class JwtService {
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
 
-    public Jwt generateJwtAccessToken(User user) {
+    public Jwt generateJwtAccessToken(UserDetails user) {
         return generateJwt(user, accessTokenExpiration);
     }
 
@@ -30,7 +31,7 @@ public class JwtService {
         return generateJwt(user, refreshTokenExpiration);
     }
 
-    private Jwt generateJwt(User user, long expiration) {
+    private Jwt generateJwt(UserDetails user, long expiration) {
         Instant now = Instant.now();
 
         String scope = user.getAuthorities().stream()
@@ -39,7 +40,7 @@ public class JwtService {
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiration))
-                .subject(user.getEmail())
+                .subject(user.getUsername())
                 .claim("role", scope)
                 .build();
 
