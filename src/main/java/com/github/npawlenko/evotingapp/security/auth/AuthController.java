@@ -27,4 +27,15 @@ public class AuthController {
     public TokenResponse register(@Valid @Argument("data") RegisterRequest registerRequest) {
         return authService.register(registerRequest);
     }
+
+    @MutationMapping("logout")
+    public void logout() {
+        authService.logout();
+    }
+
+    @PublicEndpoint
+    @MutationMapping("refresh")
+    public TokenResponse refresh() {
+        return authService.refresh();
+    }
 }
