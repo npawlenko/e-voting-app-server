@@ -30,6 +30,8 @@ public class UserGroup {
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
+    @OneToMany(mappedBy = "userGroup")
+    private List<Poll> polls;
     @ManyToMany
     @JoinTable(
             name = "user_group_association",
