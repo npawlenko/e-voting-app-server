@@ -12,6 +12,9 @@ public enum ApiRequestExceptionReason implements ExceptionWithReason {
     USER_CREDENTIALS_INVALID("error.user.invalidCredentials", HttpStatus.UNAUTHORIZED),
     USER_EMAIL_ALREADY_EXISTS("error.user.conflict.email", HttpStatus.CONFLICT),
 
+    USERGROUP_USER_ALREADY_IN_GROUP("error.usergroup.userAlreadyInGroup", HttpStatus.BAD_REQUEST),
+    USERGROUP_USER_NOT_IN_GROUP("error.usergroup.userNotInGroup", HttpStatus.BAD_REQUEST),
+
     NOT_FOUND("error.notFound", HttpStatus.NOT_FOUND),
     FORBIDDEN("error.forbidden", HttpStatus.FORBIDDEN),
 

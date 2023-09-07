@@ -5,6 +5,8 @@ type Query {
     userPolls: [Poll]
 
     pollAnswers(pollId: ID!): [PollAnswer]
+
+    userGroup(userGroupId: ID!): UserGroup
 }
 
 type Mutation {
@@ -23,6 +25,11 @@ type Mutation {
     createPollAnswer(pollId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
     updatePollAnswer(pollAnswerId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
     deletePollAnswer(pollAnswerId: ID!): Boolean
+
+    createUserGroup(userGroup: UserGroupInput!): UserGroup
+    updateUserGroup(userGroupId: ID!, userGroup: UserGroupInput!): UserGroup
+    removeUserFromUserGroup(userId: ID!): UserGroup
+    addUserToUserGroup(userId: ID!): UserGroup
 }
 
 #----------------------------#
@@ -48,6 +55,11 @@ input UserRegisterInput {
     lastName: String!
     email: String!
     password: String!
+}
+
+input UserGroupInput {
+    name: String!
+    userIds: [ID!]
 }
 # end of inputs
 
@@ -89,6 +101,13 @@ type User {
     firstName: String!
     lastName: String!
     role: Role
+}
+
+type UserGroup {
+    id: ID!
+    name: String
+    owner: User
+    users: [User]
 }
 
 type Vote {
