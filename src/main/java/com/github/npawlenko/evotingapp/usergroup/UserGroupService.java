@@ -26,6 +26,14 @@ public class UserGroupService {
     private final UserRepository userRepository;
     private final UserGroupMapper userGroupMapper;
 
+    public UserGroupResponse findUserGroupById(Long userGroupId) {
+        User loggedUser = authenticatedUserUtility.getLoggedUser();
+        UserGroup userGroup = userGroupRepository.findById(userGroupId)
+                .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
+        authorizationUtility.requireAdminOrOwnerPermission(loggedUser, userGroup.getOwner());
+        return userGroupMapper.userGroupToUserGroupResponse(userGroup);
+    }
+
     public UserGroupResponse createUserGroup(UserGroupRequest userGroupRequest) {
         User loggedUser = authenticatedUserUtility.getLoggedUser();
         UserGroup userGroup = userGroupMapper.userGroupRequestToUserGroup(userGroupRequest);

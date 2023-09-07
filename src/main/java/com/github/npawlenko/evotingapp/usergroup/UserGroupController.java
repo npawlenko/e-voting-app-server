@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -13,6 +14,11 @@ import org.springframework.stereotype.Controller;
 public class UserGroupController {
 
     private final UserGroupService userGroupService;
+
+    @QueryMapping("userGroup")
+    public UserGroupResponse findUserGroupById(@Argument("userGroupId") Long userGroupId) {
+        return userGroupService.findUserGroupById(userGroupId);
+    }
 
     @MutationMapping("createUserGroup")
     public UserGroupResponse createUserGroup(@Valid @Argument("userGroup") UserGroupRequest userGroupRequest) {

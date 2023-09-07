@@ -5,6 +5,8 @@ type Query {
     userPolls: [Poll]
 
     pollAnswers(pollId: ID!): [PollAnswer]
+
+    userGroup(userGroupId: ID!): UserGroup
 }
 
 type Mutation {
