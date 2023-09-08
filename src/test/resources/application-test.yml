@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        check_nullability: false
+      javax:
+        persistence:
+          validation:
+            mode: none
+    hibernate:
+      ddl-auto: none
