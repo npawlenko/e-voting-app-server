@@ -37,13 +37,13 @@ public abstract class UserGroupMapper {
 
     @BeforeMapping
     public void mapUserIdListToUserList(UserGroupRequest userGroupRequest, @MappingTarget UserGroup userGroup) {
-        List<User> userList = userRepository.findByUserIds(userGroupRequest.getUserIds());
+        List<User> userList = userRepository.findByUserIds(userGroupRequest.userIds());
         userGroup.setUsers(userList);
     }
 
     @AfterMapping
     protected void mapRolesInUserList(UserGroup userGroup, @MappingTarget UserGroupResponse userGroupResponse) {
-        Iterator<UserResponse> userResponseIterator = userGroupResponse.getUsers().iterator();
+        Iterator<UserResponse> userResponseIterator = userGroupResponse.users().iterator();
         userGroup.getUsers().forEach(user -> {
             RoleResponse roleResponse = roleMapper.roleToRoleResponse(user.getRole());
             userResponseIterator.next().setRole(roleResponse);

@@ -13,7 +13,6 @@ import com.github.npawlenko.evotingapp.security.auth.dto.TokenResponse;
 import com.github.npawlenko.evotingapp.token.TokenMapper;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
 import com.github.npawlenko.evotingapp.user.UserRepository;
-import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
 import com.github.npawlenko.evotingapp.utils.HttpUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -42,8 +40,6 @@ import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReaso
 public class AuthService {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-    private final AuthenticatedUserUtility authenticatedUserUtility;
     private final HttpUtility httpUtility;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -56,11 +52,11 @@ public class AuthService {
     public TokenResponse login(LoginRequest loginRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
+                        loginRequest.email(),
+                        loginRequest.password()
                 )
         );
-        User user = userRepository.findByEmail(loginRequest.getEmail())
+        User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new ApiRequestException(USER_CREDENTIALS_INVALID));
         Token token = buildToken(user);
 
@@ -70,17 +66,17 @@ public class AuthService {
     }
 
     public TokenResponse register(RegisterRequest registerRequest) {
-        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent())
+        if (userRepository.findByEmail(registerRequest.email()).isPresent())
             throw new ApiRequestException(USER_EMAIL_ALREADY_EXISTS);
 
         Role userRole = roleRepository.findByRole(RoleType.USER)
                 .orElseThrow();
 
-        String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(registerRequest.password());
         User user = userRepository.save(User.builder()
-                .email(registerRequest.getEmail())
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
+                .email(registerRequest.email())
+                .firstName(registerRequest.firstName())
+                .lastName(registerRequest.lastName())
                 .password(encodedPassword)
                 .role(userRole)
                 .build()
