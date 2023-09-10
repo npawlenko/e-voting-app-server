@@ -23,5 +23,5 @@ spring:
     baseline-on-migrate: true
     user: postgres
     password: evotingapp
-    baseline-description: "Add groups"
-    baseline-version: 1.6
+    baseline-description: "Change id data types to bigint"
+    baseline-version: 1.7
