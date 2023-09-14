@@ -5,6 +5,6 @@ import com.github.npawlenko.evotingapp.security.auth.dto.TokenResponse;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface TokenMapper {
-    TokenResponse tokenToTokenResponse(Token token);
+public abstract class TokenMapper {
+    public abstract TokenResponse tokenToTokenResponse(Token token);
 }

@@ -7,9 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface PollMapper {
+public abstract class PollMapper {
     @Mapping(source = "creator.role.role", target = "creator.role.name")
-    PollResponse pollToPollResponse(Poll poll);
+    public abstract PollResponse pollToPollResponse(Poll poll);
 
-    Poll pollRequestToPoll(PollRequest pollRequest);
+    public abstract Poll pollRequestToPoll(PollRequest pollRequest);
 }

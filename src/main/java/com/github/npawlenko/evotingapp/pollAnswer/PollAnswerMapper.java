@@ -6,8 +6,8 @@ import com.github.npawlenko.evotingapp.pollAnswer.dto.PollAnswerResponse;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface PollAnswerMapper {
+public abstract class PollAnswerMapper {
 
-    PollAnswerResponse pollAnswerToPollAnswerResponse(PollAnswer pollAnswer);
-    PollAnswer pollAnswerRequestToPollAnswer(PollAnswerRequest pollAnswerRequest);
+    public abstract PollAnswerResponse pollAnswerToPollAnswerResponse(PollAnswer pollAnswer);
+    public abstract PollAnswer pollAnswerRequestToPollAnswer(PollAnswerRequest pollAnswerRequest);
 }

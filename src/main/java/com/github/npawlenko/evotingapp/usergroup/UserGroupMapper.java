@@ -8,11 +8,14 @@ import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupRequest;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupResponse;
-import org.mapstruct.*;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.stream.IntStream;
 
 @Mapper(
         componentModel = "spring",
@@ -24,29 +27,27 @@ import java.util.List;
 public abstract class UserGroupMapper {
 
     @Autowired
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
     @Autowired
-    private RoleMapper roleMapper;
+    protected RoleMapper roleMapper;
 
     @Mapping(source = "owner.role.role", target = "owner.role.name")
     public abstract UserGroupResponse userGroupToUserGroupResponse(UserGroup userGroup);
 
+    @Mapping(target = "users", expression = "java( userRepository.findByUserIds(userGroupRequest.userIds()) )")
     public abstract UserGroup userGroupRequestToUserGroup(UserGroupRequest userGroupRequest);
 
     public abstract void updateUserGroup(UserGroupRequest userGroupRequest, @MappingTarget UserGroup userGroup);
 
-    @BeforeMapping
-    public void mapUserIdListToUserList(UserGroupRequest userGroupRequest, @MappingTarget UserGroup userGroup) {
-        List<User> userList = userRepository.findByUserIds(userGroupRequest.userIds());
-        userGroup.setUsers(userList);
-    }
-
     @AfterMapping
     protected void mapRolesInUserList(UserGroup userGroup, @MappingTarget UserGroupResponse userGroupResponse) {
-        Iterator<UserResponse> userResponseIterator = userGroupResponse.users().iterator();
-        userGroup.getUsers().forEach(user -> {
-            RoleResponse roleResponse = roleMapper.roleToRoleResponse(user.getRole());
-            userResponseIterator.next().setRole(roleResponse);
+        Iterator<User> userIterator = userGroup.getUsers().iterator();
+        int usersLength = userGroup.getUsers().size();
+        IntStream.range(0, usersLength).forEach(index -> {
+            UserResponse user = userGroupResponse.users().get(index);
+            User userSource = userIterator.next();
+            RoleResponse roleResponse = roleMapper.roleToRoleResponse(userSource.getRole());
+            userGroupResponse.users().set(index, user.withRole(roleResponse));
         });
     }
 }
