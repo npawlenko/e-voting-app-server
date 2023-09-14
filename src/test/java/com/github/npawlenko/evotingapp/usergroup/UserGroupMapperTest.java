@@ -44,7 +44,7 @@ class UserGroupMapperTest {
                 null,
                 new UserResponse(1L, null, null, null),
                 new ArrayList<>(){{
-                    add(new UserResponse());
+                    add(new UserResponse(1L, null, null, null));
                 }}
         );
         UserGroup userGroup = UserGroup.builder()
@@ -56,7 +56,7 @@ class UserGroupMapperTest {
         userGroupMapper.mapRolesInUserList(userGroup, userGroupResponse);
 
         verify(roleMapper).roleToRoleResponse(Mockito.any());
-        assertSame(roleResponse, userGroupResponse.users().get(0).getRole());
+        assertSame(roleResponse, userGroupResponse.users().get(0).role());
     }
 }
 

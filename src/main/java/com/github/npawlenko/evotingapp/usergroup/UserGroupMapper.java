@@ -5,6 +5,7 @@ import com.github.npawlenko.evotingapp.model.UserGroup;
 import com.github.npawlenko.evotingapp.role.RoleMapper;
 import com.github.npawlenko.evotingapp.role.dto.RoleResponse;
 import com.github.npawlenko.evotingapp.user.UserRepository;
+import com.github.npawlenko.evotingapp.user.dto.UserResponse;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupRequest;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupResponse;
 import org.mapstruct.AfterMapping;
@@ -14,6 +15,7 @@ import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
+import java.util.stream.IntStream;
 
 @Mapper(
         componentModel = "spring",
@@ -40,10 +42,12 @@ public abstract class UserGroupMapper {
     @AfterMapping
     protected void mapRolesInUserList(UserGroup userGroup, @MappingTarget UserGroupResponse userGroupResponse) {
         Iterator<User> userIterator = userGroup.getUsers().iterator();
-        userGroupResponse.users().forEach(user -> {
+        int usersLength = userGroup.getUsers().size();
+        IntStream.range(0, usersLength).forEach(index -> {
+            UserResponse user = userGroupResponse.users().get(index);
             User userSource = userIterator.next();
             RoleResponse roleResponse = roleMapper.roleToRoleResponse(userSource.getRole());
-            user.setRole(roleResponse);
+            userGroupResponse.users().set(index, user.withRole(roleResponse));
         });
     }
 }
