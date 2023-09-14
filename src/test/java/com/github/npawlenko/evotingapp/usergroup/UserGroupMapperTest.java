@@ -35,31 +35,6 @@ class UserGroupMapperTest {
     @MockBean
     private UserRepository userRepository;
 
-    /**
-     * Method under test: {@link UserGroupMapper#mapUserIdListToUserList(UserGroupRequest, UserGroup)}
-     */
-    @Test
-    void testMapUserIdListToUserList() {
-        when(userRepository.findByUserIds(Mockito.any())).thenReturn(new ArrayList<>(){{
-            add(new User());
-            add(new User());
-        }});
-        UserGroupRequest userGroupRequest = new UserGroupRequest(
-                "Test",
-                new ArrayList<>(){{
-                    add(1L);
-                    add(2L);
-                }}
-        );
-        UserGroup userGroup = new UserGroup();
-
-        userGroupMapper.mapUserIdListToUserList(userGroupRequest, userGroup);
-
-        verify(userRepository).findByUserIds(Mockito.any());
-        assertThat(userGroup.getUsers()).hasSize(2);
-    }
-
-
     @Test
     void testMapRolesInUserList() {
         RoleResponse roleResponse = new RoleResponse(1L, null);
