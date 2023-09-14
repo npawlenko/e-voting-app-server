@@ -6,8 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface VoteMapper {
+public abstract class VoteMapper {
 
     @Mapping(source = "poll.creator.role.role", target = "poll.creator.role.name")
-    VoteResponse voteToVoteResponse(Vote vote);
+    public abstract VoteResponse voteToVoteResponse(Vote vote);
 }

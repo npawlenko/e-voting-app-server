@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface RoleMapper {
+public abstract class RoleMapper {
     @Mapping(source = "role", target = "name")
-    RoleResponse roleToRoleResponse(Role role);
+    public abstract RoleResponse roleToRoleResponse(Role role);
 }
