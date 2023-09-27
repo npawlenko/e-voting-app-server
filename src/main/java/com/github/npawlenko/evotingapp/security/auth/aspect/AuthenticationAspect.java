@@ -72,13 +72,8 @@ public class AuthenticationAspect {
             tokenRepository.findByAccessToken(token).
                     orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
             UserDetails userDetails = userDetailsService.loadUserByUsername(decodedToken.getSubject());
-            if (!userDetails.getUsername().equals(decodedToken.getSubject())) {
-                log.error("Username does not match token subject. {} differs from {}", userDetails.getUsername(), decodedToken.getSubject());
-                throw new ApiRequestException(AUTHENTICATION_ERROR);
-            }
             authenticateUser(request, userDetails);
         } catch (JwtException e) {
-
             log.error(e.getMessage());
             e.printStackTrace();
             throw new ApiRequestException(TOKEN_INVALID);

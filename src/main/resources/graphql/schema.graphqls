@@ -68,7 +68,6 @@ input UserGroupInput {
 #----------------------------#
 type Token {
     accessToken: String!
-    refreshToken: String!
 }
 # end of special types
 

@@ -14,10 +14,13 @@ import com.github.npawlenko.evotingapp.token.TokenMapper;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
 import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.utils.HttpUtility;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.*;
@@ -38,6 +42,8 @@ import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReaso
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService {
+
+    private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 
     private final JwtService jwtService;
     private final HttpUtility httpUtility;
@@ -50,17 +56,29 @@ public class AuthService {
 
 
     public TokenResponse login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.email(),
-                        loginRequest.password()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.email(),
+                            loginRequest.password()
+                    )
+            );
+        } catch(InternalAuthenticationServiceException e) {
+            throw new ApiRequestException(USER_CREDENTIALS_INVALID);
+        }
+
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new ApiRequestException(USER_CREDENTIALS_INVALID));
-        Token token = buildToken(user);
-
+        Jwt refreshToken = jwtService.generateJwtRefreshToken(user);
+        Token token = buildToken(user, refreshToken);
         tokenRepository.save(token);
+
+        HttpServletResponse response = HttpUtility.getCurrentResponse();
+        long expiresIn = Objects.requireNonNull(refreshToken.getExpiresAt()).getEpochSecond() - Instant.now().getEpochSecond();
+        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, token.getRefreshToken());
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge((int) expiresIn);
+        response.addCookie(cookie);
 
         return tokenMapper.tokenToTokenResponse(token);
     }
@@ -100,11 +118,19 @@ public class AuthService {
 
     public TokenResponse refresh() {
         HttpServletRequest request = HttpUtility.getCurrentRequest();
-        String refreshToken = httpUtility.getAuthorizationToken(request);
+        if(request.getCookies() == null) {
+            throw new ApiRequestException(TOKEN_MISSING);
+        }
+
+        Cookie refreshCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(REFRESH_TOKEN_COOKIE_NAME))
+                .findFirst()
+                .orElseThrow(() -> new ApiRequestException(TOKEN_MISSING));
+        String refreshToken = refreshCookie.getValue();
         try {
             Jwt decodedToken = jwtService.decodeJwt(refreshToken);
             Token token = tokenRepository.findByRefreshToken(refreshToken)
-                    .orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
+                    .orElseThrow(() -> new ApiRequestException(TOKEN_INVALID));
             User user = token.getUser();
 
             if (!user.getUsername().equals(decodedToken.getSubject())) {
@@ -135,6 +161,20 @@ public class AuthService {
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
         SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    private Token buildToken(User user, Jwt refreshToken) {
+        Jwt accessToken = jwtService.generateJwtAccessToken(user);
+        return Token.builder()
+                .user(user)
+                .accessToken(accessToken.getTokenValue())
+                .refreshToken(refreshToken.getTokenValue())
+                .expiresAt(
+                        instantToLocalDateTime(
+                                Objects.requireNonNull(refreshToken.getExpiresAt())
+                        )
+                )
+                .build();
     }
 
     private Token buildToken(User user) {

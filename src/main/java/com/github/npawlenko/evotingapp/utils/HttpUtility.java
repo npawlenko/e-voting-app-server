@@ -2,6 +2,7 @@ package com.github.npawlenko.evotingapp.utils;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -13,6 +14,10 @@ public class HttpUtility {
 
     public static HttpServletRequest getCurrentRequest() {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    }
+
+    public static HttpServletResponse getCurrentResponse() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
     }
 
     public String getAuthorizationToken(HttpServletRequest request) {
