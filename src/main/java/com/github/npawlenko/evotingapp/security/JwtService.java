@@ -23,7 +23,7 @@ public class JwtService {
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
 
-    public Jwt generateJwtAccessToken(UserDetails user) {
+    public Jwt generateJwtAccessToken(User user) {
         return generateJwt(user, accessTokenExpiration);
     }
 
@@ -31,7 +31,7 @@ public class JwtService {
         return generateJwt(user, refreshTokenExpiration);
     }
 
-    private Jwt generateJwt(UserDetails user, long expiration) {
+    private Jwt generateJwt(User user, long expiration) {
         Instant now = Instant.now();
 
         String scope = user.getAuthorities().stream()
@@ -42,6 +42,7 @@ public class JwtService {
                 .expiresAt(now.plusSeconds(expiration))
                 .subject(user.getUsername())
                 .claim("role", scope)
+                .claim("fullName", user.getFullName())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
