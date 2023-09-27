@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,13 +56,17 @@ public class AuthService {
 
 
     public TokenResponse login(LoginRequest loginRequest) {
-        HttpServletRequest request = HttpUtility.getCurrentRequest();
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.email(),
-                        loginRequest.password()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.email(),
+                            loginRequest.password()
+                    )
+            );
+        } catch(InternalAuthenticationServiceException e) {
+            throw new ApiRequestException(USER_CREDENTIALS_INVALID);
+        }
+
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new ApiRequestException(USER_CREDENTIALS_INVALID));
         Jwt refreshToken = jwtService.generateJwtRefreshToken(user);
