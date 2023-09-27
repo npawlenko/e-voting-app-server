@@ -118,15 +118,19 @@ public class AuthService {
 
     public TokenResponse refresh() {
         HttpServletRequest request = HttpUtility.getCurrentRequest();
+        if(request.getCookies() == null) {
+            throw new ApiRequestException(TOKEN_MISSING);
+        }
+
         Cookie refreshCookie = Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(REFRESH_TOKEN_COOKIE_NAME))
                 .findFirst()
-                .orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
+                .orElseThrow(() -> new ApiRequestException(TOKEN_MISSING));
         String refreshToken = refreshCookie.getValue();
         try {
             Jwt decodedToken = jwtService.decodeJwt(refreshToken);
             Token token = tokenRepository.findByRefreshToken(refreshToken)
-                    .orElseThrow(() -> new ApiRequestException(AUTHENTICATION_ERROR));
+                    .orElseThrow(() -> new ApiRequestException(TOKEN_INVALID));
             User user = token.getUser();
 
             if (!user.getUsername().equals(decodedToken.getSubject())) {
