@@ -1,87 +1,78 @@
 scalar LocalDateTime
 
 type Query {
-    polls: [Poll]
-    userPolls: [Poll]
+    polls(page_size: Int = 10, page_number: Int = 0): [Poll]
+    user_polls(page_size: Int = 10, page_number: Int = 0): [Poll]
 
-    pollAnswers(pollId: ID!): [PollAnswer]
+    poll_answer(id: ID!): [PollAnswer]
 
-    userGroup(userGroupId: ID!): UserGroup
+    user_group(id: ID!): UserGroup
 }
 
 type Mutation {
-    login(data: UserLoginInput!): Token
-    register(data: UserRegisterInput!): Token
-    logout: Boolean
-    refresh: Token
+    auth_login(email: String!, password: String!): Token
+    auth_register(object: user_register_input!): Token
+    auth_logout: Boolean
+    auth_refresh: Token
 
-    createPoll(poll: PollInput!): Poll
-    updatePoll(pollId: ID!, poll: PollInput!): Poll
-    deletePoll(pollId: ID!): Boolean
+    insert_poll(poll: poll_input!): Poll
+    update_poll(poll_id: ID!, object: poll_input!): Poll
+    delete_poll(poll_id: ID!): Boolean
 
-    createVote(pollAnswerId: ID!): Vote
-    deleteVote(voteId: ID!): Boolean
+    insert_vote(poll_answer_id: ID!): Vote
+    delete_vote(id: ID!): Boolean
 
-    createPollAnswer(pollId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
-    updatePollAnswer(pollAnswerId: ID!, pollAnswer: PollAnswerInput!): PollAnswer
-    deletePollAnswer(pollAnswerId: ID!): Boolean
+    insert_poll_answer(poll_id: ID!, object: poll_answer_input!): PollAnswer
+    update_poll_answer(id: ID!, object: poll_answer_input!): PollAnswer
+    delete_poll_answer(id: ID!): Boolean
 
-    createUserGroup(userGroup: UserGroupInput!): UserGroup
-    updateUserGroup(userGroupId: ID!, userGroup: UserGroupInput!): UserGroup
-    removeUserFromUserGroup(userId: ID!): UserGroup
-    addUserToUserGroup(userId: ID!): UserGroup
+    insert_user_group(object: user_group_input!): UserGroup
+    update_user_group(id: ID!, object: user_group_input!): UserGroup
+    remove_user_from_user_group(user_id: ID!, user_group_id: ID!): UserGroup
+    insert_user_to_user_group(user_id: ID!, user_group_id: ID!): UserGroup
 }
 
 #----------------------------#
 # Inputs
 #----------------------------#
-input PollInput {
+input poll_input {
     question: String!
-    closesAt: LocalDateTime
-    isPublic: Boolean!
+    closes_at: LocalDateTime
+    public: Boolean!
 }
 
-input PollAnswerInput {
+input poll_answer_input {
     answer: String!
 }
 
-input UserLoginInput {
+input user_register_input {
+    first_name: String!
+    last_name: String!
     email: String!
     password: String!
 }
 
-input UserRegisterInput {
-    firstName: String!
-    lastName: String!
-    email: String!
-    password: String!
-}
-
-input UserGroupInput {
+input user_group_input {
     name: String!
-    userIds: [ID!]
+    user_ids: [ID!]
 }
 # end of inputs
 
 #----------------------------#
-# Special types
-#----------------------------#
-type Token {
-    accessToken: String!
-}
-# end of special types
-
-#----------------------------#
 # Types
 #----------------------------#
+type Token {
+    access_token: String!
+}
+
 type Poll {
     id: ID!
     question: String!
-    createdAt: LocalDateTime!
-    closesAt: LocalDateTime!
-    isPublic: Boolean!
+    created_at: LocalDateTime!
+    closes_at: LocalDateTime!
+    public: Boolean!
     creator: User
-    pollAnswers: [PollAnswer]
+    answers: [PollAnswer]
     votes: [Vote]
 }
 
@@ -97,8 +88,8 @@ type Role {
 
 type User {
     id: ID!
-    firstName: String!
-    lastName: String!
+    first_name: String!
+    last_name: String!
     role: Role
 }
 
@@ -111,7 +102,7 @@ type UserGroup {
 
 type Vote {
     id: ID!
-    castedAt: LocalDateTime!
+    casted_at: LocalDateTime!
     poll: Poll
     answer: PollAnswer
 }

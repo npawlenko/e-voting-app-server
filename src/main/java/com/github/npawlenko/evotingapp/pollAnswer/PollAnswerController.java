@@ -17,29 +17,29 @@ public class PollAnswerController {
 
     private final PollAnswerService pollAnswerService;
 
-    @MutationMapping("createPollAnswer")
+    @MutationMapping("insert_poll_answer")
     public PollAnswerResponse createPollAnswer(
-            @Argument("pollId") Long pollId,
-            @Argument("pollAnswer") PollAnswerRequest pollAnswer)
+            @Argument("poll_id") Long pollId,
+            @Argument("object") PollAnswerRequest pollAnswer)
     {
         return pollAnswerService.createPollAnswer(pollId, pollAnswer);
     }
 
-    @QueryMapping("pollAnswers")
-    public List<PollAnswerResponse> pollAnswers(@Argument("pollId") Long pollId) {
-        return pollAnswerService.pollAnswers(pollId);
+    @QueryMapping("poll_answer")
+    public List<PollAnswerResponse> pollAnswers(@Argument("id") Long pollId) {
+        return pollAnswerService.findPollAnswerById(pollId);
     }
 
-    @MutationMapping("updatePollAnswer")
+    @MutationMapping("update_poll_answer")
     public PollAnswerResponse updatePollAnswer(
-            @Argument("pollAnswerId") Long pollAnswerId,
-            @Valid @Argument("pollAnswer") PollAnswerRequest pollAnswer
+            @Argument("id") Long pollAnswerId,
+            @Valid @Argument("object") PollAnswerRequest pollAnswer
     ) {
         return pollAnswerService.updatePollAnswer(pollAnswerId, pollAnswer);
     }
 
-    @MutationMapping("deletePollAnswer")
-    public void deletePollAnswer(@Argument("pollAnswerId") Long pollAnswerId) {
+    @MutationMapping("delete_poll_answer")
+    public void deletePollAnswer(@Argument("id") Long pollAnswerId) {
         pollAnswerService.deletePollAnswer(pollAnswerId);
     }
 }

@@ -15,36 +15,36 @@ public class UserGroupController {
 
     private final UserGroupService userGroupService;
 
-    @QueryMapping("userGroup")
-    public UserGroupResponse findUserGroupById(@Argument("userGroupId") Long userGroupId) {
+    @QueryMapping("user_group")
+    public UserGroupResponse findUserGroupById(@Argument("id") Long userGroupId) {
         return userGroupService.findUserGroupById(userGroupId);
     }
 
-    @MutationMapping("createUserGroup")
-    public UserGroupResponse createUserGroup(@Valid @Argument("userGroup") UserGroupRequest userGroupRequest) {
+    @MutationMapping("insert_user_group")
+    public UserGroupResponse createUserGroup(@Valid @Argument("object") UserGroupRequest userGroupRequest) {
         return userGroupService.createUserGroup(userGroupRequest);
     }
 
-    @MutationMapping("updateUserGroup")
+    @MutationMapping("update_user_group")
     public UserGroupResponse updateUserGroup(
-            @Argument("userGroupId") Long userGroupId,
-            @Valid @Argument("userGroup") UserGroupRequest userGroupRequest
+            @Argument("id") Long userGroupId,
+            @Valid @Argument("object") UserGroupRequest userGroupRequest
     ) {
         return userGroupService.updateUserGroup(userGroupId, userGroupRequest);
     }
 
-    @MutationMapping("removeUserFromUserGroup")
+    @MutationMapping("remove_user_from_user_group")
     public UserGroupResponse removeUserFromUserGroup(
-            @Argument("userGroupId") Long userGroupId,
-            @Argument("userId") Long userId
+            @Argument("user_group_id") Long userGroupId,
+            @Argument("user_id") Long userId
     ) {
         return userGroupService.removeUserFromUserGroup(userGroupId, userId);
     }
 
-    @MutationMapping("addUserToUserGroup")
+    @MutationMapping("insert_user_to_user_group")
     public UserGroupResponse addUserToUserGroup(
-            @Argument("userGroupId") Long userGroupId,
-            @Argument("userId") Long userId
+            @Argument("user_group_id") Long userGroupId,
+            @Argument("user_id") Long userId
     ) {
         return userGroupService.addUserToUserGroup(userGroupId, userId);
     }

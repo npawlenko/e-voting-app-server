@@ -2,13 +2,14 @@ package com.github.npawlenko.evotingapp.poll;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
 import com.github.npawlenko.evotingapp.model.Poll;
-import com.github.npawlenko.evotingapp.model.PollAnswer;
 import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
 import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
 import com.github.npawlenko.evotingapp.utils.AuthorizationUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,16 +26,18 @@ public class PollService {
     private final PollMapper pollMapper;
     private final PollRepository pollRepository;
 
-    public List<PollResponse> accessibleForUserPolls() {
+    public List<PollResponse> accessibleForUserPolls(int pageSize, int pageNumber) {
         User user = authenticatedUserUtility.getLoggedUser();
-        return pollRepository.findAccessibleForUserPolls(user.getId()).stream()
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return pollRepository.findAccessibleForUserPolls(user.getId(), pageable).stream()
                 .map(pollMapper::pollToPollResponse)
                 .toList();
     }
 
-    public List<PollResponse> userPolls() {
+    public List<PollResponse> userPolls(int pageSize, int pageNumber) {
         User user = authenticatedUserUtility.getLoggedUser();
-        return pollRepository.findPollByCreatorId(user.getId()).stream()
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return pollRepository.findPollByCreatorId(user.getId(), pageable).stream()
                 .map(pollMapper::pollToPollResponse)
                 .toList();
     }

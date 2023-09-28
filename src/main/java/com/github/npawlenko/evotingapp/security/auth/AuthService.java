@@ -7,7 +7,6 @@ import com.github.npawlenko.evotingapp.model.Token;
 import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.role.RoleRepository;
 import com.github.npawlenko.evotingapp.security.JwtService;
-import com.github.npawlenko.evotingapp.security.auth.dto.LoginRequest;
 import com.github.npawlenko.evotingapp.security.auth.dto.RegisterRequest;
 import com.github.npawlenko.evotingapp.security.auth.dto.TokenResponse;
 import com.github.npawlenko.evotingapp.token.TokenMapper;
@@ -55,19 +54,19 @@ public class AuthService {
     private final TokenRepository tokenRepository;
 
 
-    public TokenResponse login(LoginRequest loginRequest) {
+    public TokenResponse login(String email, String password) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginRequest.email(),
-                            loginRequest.password()
+                            email,
+                            password
                     )
             );
         } catch(InternalAuthenticationServiceException e) {
             throw new ApiRequestException(USER_CREDENTIALS_INVALID);
         }
 
-        User user = userRepository.findByEmail(loginRequest.email())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiRequestException(USER_CREDENTIALS_INVALID));
         Jwt refreshToken = jwtService.generateJwtRefreshToken(user);
         Token token = buildToken(user, refreshToken);

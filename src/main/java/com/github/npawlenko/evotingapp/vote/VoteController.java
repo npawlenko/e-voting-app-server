@@ -12,13 +12,13 @@ public class VoteController {
 
     private final VoteService voteService;
 
-    @MutationMapping("createVote")
-    public VoteResponse createVote(@Argument("pollAnswerId") Long pollAnswerId) {
+    @MutationMapping("insert_vote")
+    public VoteResponse createVote(@Argument("poll_answer_id") Long pollAnswerId) {
         return voteService.createVote(pollAnswerId);
     }
 
-    @MutationMapping("deleteVote")
-    public void deleteVote(@Argument("voteId") Long voteId) {
+    @MutationMapping("delete_vote")
+    public void deleteVote(@Argument("id") Long voteId) {
         voteService.deleteVote(voteId);
     }
 }

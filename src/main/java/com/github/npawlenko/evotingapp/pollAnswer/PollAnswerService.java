@@ -61,7 +61,7 @@ public class PollAnswerService {
         pollAnswerRepository.deleteById(pollAnswerId);
     }
 
-    public List<PollAnswerResponse> pollAnswers(Long pollId) {
+    public List<PollAnswerResponse> findPollAnswerById(Long pollId) {
         User user = authenticatedUserUtility.getLoggedUser();
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
