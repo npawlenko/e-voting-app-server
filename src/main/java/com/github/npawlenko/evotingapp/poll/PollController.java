@@ -18,30 +18,36 @@ public class PollController {
     private final PollService pollService;
 
     @QueryMapping("polls")
-    public List<PollResponse> findAccessibleForUserPolls() {
+    public List<PollResponse> findAccessibleForUserPolls(
+            @Argument("limit") Integer limit,
+            @Argument("offset") Integer offset
+    ) {
         return pollService.accessibleForUserPolls();
     }
 
-    @QueryMapping("userPolls")
-    public List<PollResponse> findUserPolls() {
+    @QueryMapping("user_polls")
+    public List<PollResponse> findUserPolls(
+            @Argument("limit") Integer limit,
+            @Argument("offset") Integer offset
+    ) {
         return pollService.userPolls();
     }
 
-    @MutationMapping("createPoll")
-    public PollResponse createPoll(@Valid @Argument("poll") PollRequest pollRequest) {
+    @MutationMapping("insert_poll")
+    public PollResponse createPoll(@Valid @Argument("object") PollRequest pollRequest) {
         return pollService.createPoll(pollRequest);
     }
 
-    @MutationMapping("updatePoll")
+    @MutationMapping("update_poll")
     public PollResponse updatePoll(
-            @Argument("pollId") Long pollId,
-            @Valid @Argument("poll") PollRequest pollRequest
+            @Argument("id") Long pollId,
+            @Valid @Argument("object") PollRequest pollRequest
     ) {
         return pollService.updatePoll(pollId, pollRequest);
     }
 
-    @MutationMapping("deletePoll")
-    public void deletePoll(@Argument("pollId") Long pollId) {
+    @MutationMapping("delete_poll")
+    public void deletePoll(@Argument("id") Long pollId) {
         pollService.deletePoll(pollId);
     }
 }
