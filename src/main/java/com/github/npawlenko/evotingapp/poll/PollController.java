@@ -3,6 +3,7 @@ package com.github.npawlenko.evotingapp.poll;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -19,18 +20,18 @@ public class PollController {
 
     @QueryMapping("polls")
     public List<PollResponse> findAccessibleForUserPolls(
-            @Argument("limit") Integer limit,
-            @Argument("offset") Integer offset
+            @Min(1) @Argument("page_size") int pageSize,
+            @Min(0) @Argument("page_number") int pageNumber
     ) {
-        return pollService.accessibleForUserPolls();
+        return pollService.accessibleForUserPolls(pageSize, pageNumber);
     }
 
     @QueryMapping("user_polls")
     public List<PollResponse> findUserPolls(
-            @Argument("limit") Integer limit,
-            @Argument("offset") Integer offset
+            @Min(1) @Argument("page_size") int pageSize,
+            @Min(0) @Argument("page_number") int pageNumber
     ) {
-        return pollService.userPolls();
+        return pollService.userPolls(pageSize, pageNumber);
     }
 
     @MutationMapping("insert_poll")

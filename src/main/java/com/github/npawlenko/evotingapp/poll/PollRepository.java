@@ -1,6 +1,7 @@
 package com.github.npawlenko.evotingapp.poll;
 
 import com.github.npawlenko.evotingapp.model.Poll;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,7 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
                             )
             """
     )
-    List<Poll> findAccessibleForUserPolls(@Param("userId") Long userId);
+    List<Poll> findAccessibleForUserPolls(@Param("userId") Long userId, Pageable pageable);
 
-    List<Poll> findPollByCreatorId(Long creatorId);
+    List<Poll> findPollByCreatorId(Long creatorId, Pageable pageable);
 }

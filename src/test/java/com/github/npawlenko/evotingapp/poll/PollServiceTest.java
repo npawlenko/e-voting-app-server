@@ -43,76 +43,76 @@ class PollServiceTest {
     private PollService pollService;
 
     /**
-     * Method under test: {@link PollService#accessibleForUserPolls()}
+     * Method under test: {@link PollService#accessibleForUserPolls(int, int)}
      */
     @Test
     void testAccessibleForUserPolls_ReturnsEmptyList() {
         when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
-        when(pollRepository.findAccessibleForUserPolls(Mockito.<Long>any())).thenReturn(new ArrayList<>());
-        assertTrue(pollService.accessibleForUserPolls().isEmpty());
+        when(pollRepository.findAccessibleForUserPolls(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>());
+        assertTrue(pollService.accessibleForUserPolls(10, 0).isEmpty());
         verify(authenticatedUserUtility).getLoggedUser();
-        verify(pollRepository).findAccessibleForUserPolls(Mockito.<Long>any());
+        verify(pollRepository).findAccessibleForUserPolls(Mockito.<Long>any(), Mockito.any());
     }
 
     /**
-     * Method under test: {@link PollService#accessibleForUserPolls()}
+     * Method under test: {@link PollService#accessibleForUserPolls(int, int)}
      */
     @Test
     void testAccessibleForUserPolls_ThrowsApiRequestException_UserNotLoggedIn() {
         when(authenticatedUserUtility.getLoggedUser()).thenThrow(new ApiRequestException(USER_NOT_LOGGED_IN));
-        assertThrows(ApiRequestException.class, () -> pollService.accessibleForUserPolls());
+        assertThrows(ApiRequestException.class, () -> pollService.accessibleForUserPolls(10, 0));
         verify(authenticatedUserUtility).getLoggedUser();
     }
 
     /**
-     * Method under test: {@link PollService#accessibleForUserPolls()}
+     * Method under test: {@link PollService#accessibleForUserPolls(int, int)}
      */
     @Test
     void testAccessibleForUserPolls_ReturnsPollList() {
         when(authenticatedUserUtility.getLoggedUser()).thenReturn(User.builder().id(1L).build());
-        when(pollRepository.findAccessibleForUserPolls(Mockito.<Long>any())).thenReturn(new ArrayList<>(){{
+        when(pollRepository.findAccessibleForUserPolls(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>() {{
             add(new Poll());
         }});
-        assertThat(pollService.accessibleForUserPolls()).hasSize(1);
+        assertThat(pollService.accessibleForUserPolls(10, 0)).hasSize(1);
         verify(authenticatedUserUtility).getLoggedUser();
-        verify(pollRepository).findAccessibleForUserPolls(Mockito.<Long>any());
+        verify(pollRepository).findAccessibleForUserPolls(Mockito.<Long>any(), Mockito.any());
     }
 
     /**
-     * Method under test: {@link PollService#userPolls()}
+     * Method under test: {@link PollService#userPolls(int, int)}
      */
     @Test
     void testUserPolls_ReturnsEmptyList() {
         when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
-        when(pollRepository.findPollByCreatorId(Mockito.<Long>any())).thenReturn(new ArrayList<>());
-        assertTrue(pollService.userPolls().isEmpty());
+        when(pollRepository.findPollByCreatorId(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>());
+        assertTrue(pollService.userPolls(10, 0).isEmpty());
         verify(authenticatedUserUtility).getLoggedUser();
-        verify(pollRepository).findPollByCreatorId(Mockito.<Long>any());
+        verify(pollRepository).findPollByCreatorId(Mockito.<Long>any(), Mockito.any());
     }
 
     /**
-     * Method under test: {@link PollService#userPolls()}
+     * Method under test: {@link PollService#userPolls(int, int)}
      */
     @Test
     void testUserPolls_ThrowsApiRequestException_UserNotLoggedIn() {
         when(authenticatedUserUtility.getLoggedUser())
                 .thenThrow(new ApiRequestException(USER_NOT_LOGGED_IN));
-        assertThrows(ApiRequestException.class, () -> pollService.userPolls());
+        assertThrows(ApiRequestException.class, () -> pollService.userPolls(10, 0));
         verify(authenticatedUserUtility).getLoggedUser();
     }
 
     /**
-     * Method under test: {@link PollService#userPolls()}
+     * Method under test: {@link PollService#userPolls(int, int)}
      */
     @Test
     void testUserPolls_ReturnsPollList() {
         when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
-        when(pollRepository.findPollByCreatorId(Mockito.<Long>any())).thenReturn(new ArrayList<>(){{
+        when(pollRepository.findPollByCreatorId(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>() {{
             add(new Poll());
         }});
-        assertThat(pollService.userPolls()).hasSize(1);
+        assertThat(pollService.userPolls(10, 0)).hasSize(1);
         verify(authenticatedUserUtility).getLoggedUser();
-        verify(pollRepository).findPollByCreatorId(Mockito.<Long>any());
+        verify(pollRepository).findPollByCreatorId(Mockito.<Long>any(), Mockito.any());
     }
 
     /**
