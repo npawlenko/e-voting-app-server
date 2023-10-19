@@ -37,7 +37,7 @@ type Mutation {
 #----------------------------#
 input poll_input {
     question: String!
-    closes_at: LocalDateTime
+    closesAt: LocalDateTime
     public: Boolean!
 }
 
@@ -46,8 +46,8 @@ input poll_answer_input {
 }
 
 input user_register_input {
-    first_name: String!
-    last_name: String!
+    firstName: String!
+    lastName: String!
     email: String!
     password: String!
 }
@@ -62,14 +62,14 @@ input user_group_input {
 # Types
 #----------------------------#
 type Token {
-    access_token: String!
+    accessToken: String!
 }
 
 type Poll {
     id: ID!
     question: String!
-    created_at: LocalDateTime!
-    closes_at: LocalDateTime!
+    createdAt: LocalDateTime!
+    closesAt: LocalDateTime!
     public: Boolean!
     creator: User
     answers: [PollAnswer]
@@ -88,8 +88,8 @@ type Role {
 
 type User {
     id: ID!
-    first_name: String!
-    last_name: String!
+    firstName: String!
+    lastName: String!
     role: Role
 }
 
@@ -102,7 +102,7 @@ type UserGroup {
 
 type Vote {
     id: ID!
-    casted_at: LocalDateTime!
+    castedAt: LocalDateTime!
     poll: Poll
     answer: PollAnswer
 }
