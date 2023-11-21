@@ -1,8 +1,10 @@
 package com.github.npawlenko.evotingapp.security.auth;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
-import com.github.npawlenko.evotingapp.model.*;
-import com.github.npawlenko.evotingapp.resetToken.ResetTokenRepository;
+import com.github.npawlenko.evotingapp.model.Role;
+import com.github.npawlenko.evotingapp.model.RoleType;
+import com.github.npawlenko.evotingapp.model.Token;
+import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.role.RoleRepository;
 import com.github.npawlenko.evotingapp.security.JwtService;
 import com.github.npawlenko.evotingapp.security.auth.dto.RegisterRequest;
@@ -10,15 +12,12 @@ import com.github.npawlenko.evotingapp.security.auth.dto.TokenResponse;
 import com.github.npawlenko.evotingapp.token.TokenMapper;
 import com.github.npawlenko.evotingapp.token.TokenRepository;
 import com.github.npawlenko.evotingapp.user.UserRepository;
-import com.github.npawlenko.evotingapp.utils.EmailUtility;
 import com.github.npawlenko.evotingapp.utils.HttpUtility;
-import com.github.npawlenko.evotingapp.utils.TokenUtility;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,17 +46,12 @@ public class AuthService {
 
     private final JwtService jwtService;
     private final HttpUtility httpUtility;
-    private final EmailUtility emailUtility;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenMapper tokenMapper;
     private final TokenRepository tokenRepository;
-    private final ResetTokenRepository resetTokenRepository;
-
-    @Value("${application.security.password-reset-token-expiration-seconds}")
-    private Long passwordResetTokenExpiration;
 
 
     public TokenResponse login(String email, String password) {
@@ -68,7 +62,7 @@ public class AuthService {
                             password
                     )
             );
-        } catch (InternalAuthenticationServiceException e) {
+        } catch(InternalAuthenticationServiceException e) {
             throw new ApiRequestException(USER_CREDENTIALS_INVALID);
         }
 
@@ -123,7 +117,7 @@ public class AuthService {
 
     public TokenResponse refresh() {
         HttpServletRequest request = HttpUtility.getCurrentRequest();
-        if (request.getCookies() == null) {
+        if(request.getCookies() == null) {
             throw new ApiRequestException(TOKEN_MISSING);
         }
 
@@ -195,33 +189,6 @@ public class AuthService {
                         )
                 )
                 .build();
-    }
-
-    public void resetPassword(String newPassword, String token) {
-        ResetToken resetToken = resetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ApiRequestException(FORBIDDEN);
-        }
-        String encodedPassword = passwordEncoder.encode(newPassword);
-        User user = resetToken.getUser();
-        user.setPassword(encodedPassword);
-        userRepository.save(user);
-    }
-
-
-    public void resetPasswordSendLink(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        String token = TokenUtility.generateSecureToken();
-        ResetToken resetToken = ResetToken.builder()
-                .user(user)
-                .expiresAt(LocalDateTime.now().plusSeconds(passwordResetTokenExpiration))
-                .build();
-        resetTokenRepository.save(resetToken);
-        emailUtility.sendSimpleMessage(email,
-                "Resetowanie hasłą",
-                String.format("Zresetuj hasło używając tokena %s", token));
     }
 
     private LocalDateTime instantToLocalDateTime(Instant instant) {

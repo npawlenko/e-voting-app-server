@@ -2,24 +2,14 @@ application:
   jwt:
     access-token-expiration-seconds: 900 #15min
     refresh-token-expiration-seconds: 604800 #7d
-  security:
-    password-reset-token-expiration-seconds: 300 #5min
 spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:postgresql://${POSTGRESQL_DB_HOST}:${POSTGRESQL_DB_PORT}/${POSTGRESQL_DB_NAME}
-    username: ${POSTGRESQL_DB_USERNAME}
-    password: ${POSTGRESQL_DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/evotingapp
+    username: postgres
+    password: evotingapp
     driver-class-name: org.postgresql.Driver
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
   jpa:
     hibernate:
       ddl-auto: validate
@@ -33,4 +23,5 @@ spring:
     baseline-on-migrate: true
     user: postgres
     password: evotingapp
-    baseline-version: 1.8
+    baseline-description: "Change id data types to bigint"
+    baseline-version: 1.7
