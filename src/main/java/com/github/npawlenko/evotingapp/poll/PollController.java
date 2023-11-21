@@ -2,6 +2,7 @@ package com.github.npawlenko.evotingapp.poll;
 
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
+import com.github.npawlenko.evotingapp.security.auth.aspect.PublicEndpoint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,17 @@ public class PollController {
             @Min(0) @Argument("page_number") int pageNumber
     ) {
         return pollService.accessibleForUserPolls(pageSize, pageNumber);
+    }
+
+    @QueryMapping("poll")
+    public PollResponse findPollById(@Argument("poll_id") Long pollId) {
+        return pollService.findPollById(pollId);
+    }
+
+    @PublicEndpoint
+    @QueryMapping("poll_by_token")
+    public PollResponse findByPollByIdUsingToken(@Argument("vote_token") String token) {
+        return pollService.findPollByIdUsingToken(token);
     }
 
     @QueryMapping("user_polls")

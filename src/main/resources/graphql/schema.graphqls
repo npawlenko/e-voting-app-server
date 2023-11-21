@@ -4,6 +4,8 @@ type Query {
     polls(page_size: Int = 10, page_number: Int = 0): [Poll]
     user_polls(page_size: Int = 10, page_number: Int = 0): [Poll]
 
+    poll(poll_id: ID!): Poll
+    poll_by_token(vote_token: String!): Poll
     poll_answer(id: ID!): [PollAnswer]
 
     user_group(id: ID!): UserGroup
@@ -14,12 +16,14 @@ type Mutation {
     auth_register(object: user_register_input!): Token
     auth_logout: Boolean
     auth_refresh: Token
+    auth_reset_password(new_password: String!, reset_token: String!): Boolean
 
     insert_poll(poll: poll_input!): Poll
     update_poll(poll_id: ID!, object: poll_input!): Poll
     delete_poll(poll_id: ID!): Boolean
 
     insert_vote(poll_answer_id: ID!): Vote
+    insert_vote_by_token(poll_answer_id: ID!, vote_token: String!): Vote
     delete_vote(id: ID!): Boolean
 
     insert_poll_answer(poll_id: ID!, object: poll_answer_input!): PollAnswer
@@ -38,6 +42,7 @@ type Mutation {
 input poll_input {
     question: String!
     closesAt: LocalDateTime
+    nonSystemUsersEmails: [String]
     public: Boolean!
 }
 

@@ -32,6 +32,18 @@ public class AuthController {
         return authService.register(registerRequest);
     }
 
+    @PublicEndpoint
+    @MutationMapping("auth_reset_password")
+    public void resetPassword(@Argument("new_password") String newPassword, @Argument("reset_token") String token) {
+        authService.resetPassword(newPassword, token);
+    }
+
+    @PublicEndpoint
+    @MutationMapping("auth_send_reset_passoword_link")
+    public void resetPasswordSendLink(@Argument("email") String email) {
+        authService.resetPasswordSendLink(email);
+    }
+
     @MutationMapping("auth_logout")
     public void logout() {
         authService.logout();
