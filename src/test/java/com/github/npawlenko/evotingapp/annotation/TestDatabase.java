@@ -1,6 +1,6 @@
 package com.github.npawlenko.evotingapp.annotation;
 
-import com.github.npawlenko.evotingapp.configuration.TestContainersConfiguration;
+import com.github.npawlenko.evotingapp.TestContainersConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
