@@ -8,6 +8,8 @@ import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupRequest;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupResponse;
+import com.github.npawlenko.evotingapp.voteToken.VoteTokenRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -28,6 +30,8 @@ import static org.mockito.Mockito.when;
 class UserGroupMapperTest {
     @MockBean
     private RoleMapper roleMapper;
+    @MockBean
+    private VoteTokenRepository voteTokenRepository;
 
     @Autowired
     private UserGroupMapper userGroupMapper;
