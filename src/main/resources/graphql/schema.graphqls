@@ -15,7 +15,7 @@ type Mutation {
     auth_login(email: String!, password: String!): Token
     auth_register(object: user_register_input!): Token
     auth_logout: Boolean
-    auth_refresh: Token
+    auth_refresh(refresh_token: String!): Token
     auth_reset_password(new_password: String!, reset_token: String!): Boolean
     auth_send_reset_password_link(email: String!): Boolean
 
@@ -44,7 +44,7 @@ input poll_input {
     question: String!
     closesAt: LocalDateTime
     nonSystemUsersEmails: [String]
-    public: Boolean!
+    isPublic: Boolean!
 }
 
 input poll_answer_input {
@@ -69,6 +69,7 @@ input user_group_input {
 #----------------------------#
 type Token {
     accessToken: String!
+    refreshToken: String!
 }
 
 type Poll {
@@ -76,7 +77,7 @@ type Poll {
     question: String!
     createdAt: LocalDateTime!
     closesAt: LocalDateTime!
-    public: Boolean!
+    isPublic: Boolean!
     creator: User
     answers: [PollAnswer]
     votes: [Vote]
