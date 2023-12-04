@@ -51,7 +51,7 @@ public class AuthController {
 
     @PublicEndpoint
     @MutationMapping("auth_refresh")
-    public TokenResponse refresh() {
-        return authService.refresh();
+    public TokenResponse refresh(@Argument("refresh_token") String refreshToken) {
+        return authService.refresh(refreshToken);
     }
 }

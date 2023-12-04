@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public abstract class PollMapper {
     @Mapping(source = "creator.role.role", target = "creator.role.name")
+    @Mapping(source = "public", target = "isPublic")
     public abstract PollResponse pollToPollResponse(Poll poll);
 
     public abstract Poll pollRequestToPoll(PollRequest pollRequest);

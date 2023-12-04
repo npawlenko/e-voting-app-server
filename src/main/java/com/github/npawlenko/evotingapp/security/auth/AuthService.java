@@ -43,6 +43,7 @@ import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReaso
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 
     private final JwtService jwtService;
@@ -74,18 +75,23 @@ public class AuthService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiRequestException(USER_CREDENTIALS_INVALID));
+        Jwt accessToken = jwtService.generateJwtAccessToken(user);
         Jwt refreshToken = jwtService.generateJwtRefreshToken(user);
-        Token token = buildToken(user, refreshToken);
+        Token token = buildToken(user, accessToken, refreshToken);
         tokenRepository.save(token);
 
         HttpServletResponse response = HttpUtility.getCurrentResponse();
-        long expiresIn = Objects.requireNonNull(refreshToken.getExpiresAt()).getEpochSecond() - Instant.now().getEpochSecond();
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, token.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge((int) expiresIn);
-        response.addCookie(cookie);
+        addTokenCookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, token.getAccessToken(), response);
+        addTokenCookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, token.getRefreshToken(), response);
 
         return tokenMapper.tokenToTokenResponse(token);
+    }
+
+    private static void addTokenCookie(String name, Jwt tokenJwt, String token, HttpServletResponse response) {
+        long expiresIn = Objects.requireNonNull(tokenJwt.getExpiresAt()).getEpochSecond() - Instant.now().getEpochSecond();
+        Cookie cookie = new Cookie(name, token);
+        cookie.setMaxAge((int) expiresIn);
+        response.addCookie(cookie);
     }
 
     public TokenResponse register(RegisterRequest registerRequest) {
@@ -121,17 +127,8 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    public TokenResponse refresh() {
+    public TokenResponse refresh(String refreshToken) {
         HttpServletRequest request = HttpUtility.getCurrentRequest();
-        if (request.getCookies() == null) {
-            throw new ApiRequestException(TOKEN_MISSING);
-        }
-
-        Cookie refreshCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(REFRESH_TOKEN_COOKIE_NAME))
-                .findFirst()
-                .orElseThrow(() -> new ApiRequestException(TOKEN_MISSING));
-        String refreshToken = refreshCookie.getValue();
         try {
             Jwt decodedToken = jwtService.decodeJwt(refreshToken);
             Token token = tokenRepository.findByRefreshToken(refreshToken)
@@ -144,9 +141,15 @@ public class AuthService {
             }
             authorizeUser(request, user);
 
-            Token newToken = buildToken(user);
+            Jwt newAccessToken = jwtService.generateJwtAccessToken(user);
+            Jwt newRefreshToken = jwtService.generateJwtRefreshToken(user);
+            Token newToken = buildToken(user, newAccessToken, newRefreshToken);
             tokenRepository.delete(token);
             tokenRepository.save(newToken);
+
+            HttpServletResponse response = HttpUtility.getCurrentResponse();
+            addTokenCookie(ACCESS_TOKEN_COOKIE_NAME, newAccessToken, token.getAccessToken(), response);
+            addTokenCookie(REFRESH_TOKEN_COOKIE_NAME, newRefreshToken, token.getRefreshToken(), response);
 
             return tokenMapper.tokenToTokenResponse(newToken);
         } catch (JwtException e) {
@@ -166,6 +169,19 @@ public class AuthService {
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
         SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    private Token buildToken(User user, Jwt accessToken, Jwt refreshToken) {
+        return Token.builder()
+                    .user(user)
+                    .accessToken(accessToken.getTokenValue())
+                    .refreshToken(refreshToken.getTokenValue())
+                    .expiresAt(
+                            instantToLocalDateTime(
+                                    Objects.requireNonNull(refreshToken.getExpiresAt())
+                            )
+                    )
+                    .build();
     }
 
     private Token buildToken(User user, Jwt refreshToken) {
@@ -221,7 +237,7 @@ public class AuthService {
                 .build();
         resetTokenRepository.save(resetToken);
         emailUtility.sendSimpleMessage(email,
-                "Resetowanie hasłą",
+                "Resetowanie hasła",
                 String.format("Zresetuj hasło używając tokena %s", token));
     }
 

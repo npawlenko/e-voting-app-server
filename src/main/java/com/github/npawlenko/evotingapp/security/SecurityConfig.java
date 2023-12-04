@@ -57,16 +57,18 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .anonymous(anonymous -> anonymous.disable())
                 .cors(cors -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+                    configuration.setAllowedOrigins(List.of("http://localhost:3000", "localhost:3000"));
                     configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
-                    configuration.setAllowedHeaders(List.of("*"));
+                    configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+                    configuration.setAllowCredentials(true);
+                    configuration.setExposedHeaders(List.of("Set-Cookie"));
                     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                     source.registerCorsConfiguration("/**", configuration);
                     cors.configurationSource(source);
                 })
+                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/graphql").permitAll();
                     auth.requestMatchers("/graphiql").permitAll();
