@@ -81,6 +81,7 @@ type Poll {
     creator: User
     answers: [PollAnswer]
     votes: [Vote]
+    votePlaced: Boolean!
 }
 
 type PollAnswer {

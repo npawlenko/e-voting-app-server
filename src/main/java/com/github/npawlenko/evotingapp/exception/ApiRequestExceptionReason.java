@@ -17,6 +17,7 @@ public enum ApiRequestExceptionReason implements ExceptionWithReason {
 
     NOT_FOUND("error.notFound", HttpStatus.NOT_FOUND),
     FORBIDDEN("error.forbidden", HttpStatus.FORBIDDEN),
+    CONFLICT("error.conflict", HttpStatus.CONFLICT),
 
     TOKEN_MISSING("error.token.missing", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID("error.token.invalid", HttpStatus.UNAUTHORIZED),

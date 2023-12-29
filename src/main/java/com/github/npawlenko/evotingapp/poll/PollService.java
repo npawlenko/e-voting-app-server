@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.FORBIDDEN;
 import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.NOT_FOUND;
@@ -93,7 +94,7 @@ public class PollService {
     public PollResponse findPollById(Long pollId) {
         User user = authenticatedUserUtility.getLoggedUser();
         Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        if (!poll.getCreator().equals(user) || !poll.getUserGroup().getUsers().contains(user)) {
+        if (!poll.getCreator().equals(user) && !userInPollUserGroup(user, poll)) {
             throw new ApiRequestException(FORBIDDEN);
         }
         return pollMapper.pollToPollResponse(poll);
@@ -102,5 +103,9 @@ public class PollService {
     public PollResponse findPollByIdUsingToken(String token) {
         VoteToken voteToken = voteTokenRepository.findByToken(token).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
         return pollMapper.pollToPollResponse(voteToken.getPoll());
+    }
+
+    private boolean userInPollUserGroup(User user, Poll poll) {
+        return Optional.ofNullable(poll.getUserGroup()).map(ug -> ug.getUsers().contains(user)).orElse(false);
     }
 }

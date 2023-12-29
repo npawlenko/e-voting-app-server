@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.FORBIDDEN;
-import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.NOT_FOUND;
+import static com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +35,9 @@ public class VoteService {
         if (!isEligibleForVote(poll, loggedUser) || poll.getClosesAt().isBefore(LocalDateTime.now())) {
             throw new ApiRequestException(FORBIDDEN);
         }
+        if (voteRepository.findByVoterAndPoll(loggedUser, poll).isPresent()) {
+            throw new ApiRequestException(CONFLICT);
+        }
 
         Vote vote = Vote.builder()
                 .poll(poll)
@@ -48,7 +50,7 @@ public class VoteService {
     }
 
     private static boolean isEligibleForVote(Poll poll, User loggedUser) {
-        return (!poll.isPublic() && !poll.getUserGroup().getUsers().contains(loggedUser));
+        return (poll.isPublic() || poll.getUserGroup().getUsers().contains(loggedUser));
     }
 
     public void deleteVote(Long voteId) {
