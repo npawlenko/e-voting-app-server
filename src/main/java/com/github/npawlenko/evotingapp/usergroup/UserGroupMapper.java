@@ -4,6 +4,7 @@ import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.model.UserGroup;
 import com.github.npawlenko.evotingapp.role.RoleMapper;
 import com.github.npawlenko.evotingapp.role.dto.RoleResponse;
+import com.github.npawlenko.evotingapp.user.UserMapper;
 import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupRequest;
@@ -20,8 +21,7 @@ import java.util.stream.IntStream;
 @Mapper(
         componentModel = "spring",
         uses = {
-                UserRepository.class,
-                RoleMapper.class
+                UserMapper.class
         }
 )
 public abstract class UserGroupMapper {
@@ -31,7 +31,6 @@ public abstract class UserGroupMapper {
     @Autowired
     protected RoleMapper roleMapper;
 
-    @Mapping(source = "owner.role.role", target = "owner.role.name")
     public abstract UserGroupResponse userGroupToUserGroupResponse(UserGroup userGroup);
 
     @Mapping(target = "users", expression = "java( userRepository.findByUserIds(userGroupRequest.userIds()) )")

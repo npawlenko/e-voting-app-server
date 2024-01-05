@@ -9,6 +9,7 @@ type Query {
     poll_answer(id: ID!): [PollAnswer]
 
     user_group(id: ID!): UserGroup
+    users: [User]
 }
 
 type Mutation {
@@ -44,7 +45,9 @@ input poll_input {
     question: String!
     closesAt: LocalDateTime
     nonSystemUsersEmails: [String]
+    systemUsers: [String]
     isPublic: Boolean!
+    answers: [poll_answer_input]!
 }
 
 input poll_answer_input {
@@ -80,6 +83,7 @@ type Poll {
     isPublic: Boolean!
     creator: User
     answers: [PollAnswer]
+    userGroup: UserGroup
     votes: [Vote]
     votePlaced: Boolean!
 }
@@ -98,6 +102,7 @@ type User {
     id: ID!
     firstName: String!
     lastName: String!
+    email: String!
     role: Role
 }
 

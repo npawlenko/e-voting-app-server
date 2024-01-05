@@ -3,9 +3,11 @@ package com.github.npawlenko.evotingapp.poll;
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
 import com.github.npawlenko.evotingapp.model.Poll;
 import com.github.npawlenko.evotingapp.model.User;
+import com.github.npawlenko.evotingapp.model.UserGroup;
 import com.github.npawlenko.evotingapp.model.VoteToken;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
+import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
 import com.github.npawlenko.evotingapp.utils.AuthorizationUtility;
 import com.github.npawlenko.evotingapp.utils.EmailUtility;
@@ -33,6 +35,7 @@ public class PollService {
     private final PollMapper pollMapper;
     private final PollRepository pollRepository;
     private final VoteTokenRepository voteTokenRepository;
+    private final UserRepository userRepository;
 
     public List<PollResponse> accessibleForUserPolls(int pageSize, int pageNumber) {
         User user = authenticatedUserUtility.getLoggedUser();
@@ -51,10 +54,19 @@ public class PollService {
 
         Poll poll = pollMapper.pollRequestToPoll(pollRequest);
         poll.setCreatedAt(LocalDateTime.now());
+        poll.setClosesAt(pollRequest.getClosesAt());
         poll.setCreator(user);
-        Poll savedPoll = pollRepository.save(poll);
 
-        pollRequest.nonSystemUsersEmails().forEach(email -> {
+        UserGroup ug = new UserGroup();
+        List<User> users = userRepository.findAllById(pollRequest.getSystemUsers());
+        ug.setUsers(users);
+        ug.setPolls(List.of(poll));
+        ug.setOwner(user);
+        ug.setName("Unnamed");
+        poll.setUserGroup(ug);
+        pollRepository.save(poll);
+
+        pollRequest.getNonSystemUsersEmails().forEach(email -> {
             String token = TokenUtility.generateSecureToken();
             VoteToken voteToken = VoteToken.builder()
                     .poll(poll)
@@ -67,7 +79,7 @@ public class PollService {
                     String.format("Zagłosuj używając tokena %s", token));
         });
 
-        return pollMapper.pollToPollResponse(savedPoll);
+        return pollMapper.pollToPollResponse(poll);
     }
 
 

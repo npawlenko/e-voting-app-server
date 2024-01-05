@@ -47,7 +47,7 @@ public class PollController {
     }
 
     @MutationMapping("insert_poll")
-    public PollResponse createPoll(@Valid @Argument("object") PollRequest pollRequest) {
+    public PollResponse createPoll(@Valid @Argument("poll") PollRequest pollRequest) {
         return pollService.createPoll(pollRequest);
     }
 

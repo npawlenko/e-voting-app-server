@@ -9,7 +9,6 @@ import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
 import com.github.npawlenko.evotingapp.utils.AuthorizationUtility;
 import com.github.npawlenko.evotingapp.utils.EmailUtility;
 import com.github.npawlenko.evotingapp.voteToken.VoteTokenRepository;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -129,11 +128,11 @@ class PollServiceTest {
     @Test
     void testCreatePoll_CreatesPoll() {
         when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
-        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, null);
+        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, false);
         when(pollMapper.pollToPollResponse(Mockito.any())).thenReturn(pollResponse);
         when(pollMapper.pollRequestToPoll(Mockito.any())).thenReturn(new Poll());
         when(pollRepository.save(Mockito.any())).thenReturn(new Poll());
-        assertSame(pollResponse, pollService.createPoll(new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), true)));
+        assertSame(pollResponse, pollService.createPoll(new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), new ArrayList<>(), true, new ArrayList<>())));
         verify(authenticatedUserUtility).getLoggedUser();
         verify(pollMapper).pollRequestToPoll(Mockito.any());
         verify(pollMapper).pollToPollResponse(Mockito.any());
@@ -147,7 +146,7 @@ class PollServiceTest {
     void testCreatePoll_ThrowsApiRequestException_UserNotLoggedIn() {
         when(authenticatedUserUtility.getLoggedUser())
                 .thenThrow(new ApiRequestException(USER_NOT_LOGGED_IN, "Args"));
-        assertThrows(ApiRequestException.class, () -> pollService.createPoll(new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), true)));
+        assertThrows(ApiRequestException.class, () -> pollService.createPoll(new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), new ArrayList<>(), true, new ArrayList<>())));
         verify(authenticatedUserUtility).getLoggedUser();
     }
 
@@ -158,12 +157,12 @@ class PollServiceTest {
     void testUpdatePoll_UpdatesPoll() {
         when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
         doNothing().when(authorizationUtility).requireAdminOrOwnerPermission(Mockito.any(), Mockito.any());
-        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, null);
+        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, false);
         when(pollMapper.pollToPollResponse(Mockito.any())).thenReturn(pollResponse);
         when(pollMapper.pollRequestToPoll(Mockito.any())).thenReturn(new Poll());
         when(pollRepository.save(Mockito.any())).thenReturn(new Poll());
         when(pollRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(new Poll()));
-        assertSame(pollResponse, pollService.updatePoll(1L, new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), true)));
+        assertSame(pollResponse, pollService.updatePoll(1L, new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), new ArrayList<>(), true, new ArrayList<>())));
         verify(authenticatedUserUtility).getLoggedUser();
         verify(authorizationUtility).requireAdminOrOwnerPermission(Mockito.any(), Mockito.any());
         verify(pollMapper).pollRequestToPoll(Mockito.any());
@@ -179,7 +178,7 @@ class PollServiceTest {
     void testUpdatePoll_ThrowsApiRequestException_UserNotLoggedIn() {
         when(authenticatedUserUtility.getLoggedUser())
                 .thenThrow(new ApiRequestException(USER_NOT_LOGGED_IN));
-        assertThrows(ApiRequestException.class, () -> pollService.updatePoll(1L, new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), true)));
+        assertThrows(ApiRequestException.class, () -> pollService.updatePoll(1L, new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), new ArrayList<>(), true, new ArrayList<>())));
         verify(authenticatedUserUtility).getLoggedUser();
     }
 

@@ -6,10 +6,8 @@ import com.github.npawlenko.evotingapp.role.RoleMapper;
 import com.github.npawlenko.evotingapp.role.dto.RoleResponse;
 import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
-import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupRequest;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupResponse;
 import com.github.npawlenko.evotingapp.voteToken.VoteTokenRepository;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -20,7 +18,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,9 +43,9 @@ class UserGroupMapperTest {
         UserGroupResponse userGroupResponse = new UserGroupResponse(
                 1L,
                 null,
-                new UserResponse(1L, null, null, null),
-                new ArrayList<>(){{
-                    add(new UserResponse(1L, null, null, null));
+                new UserResponse(1L, null, null, null, null),
+                new ArrayList<>() {{
+                    add(new UserResponse(1L, null, null, null, null));
                 }}
         );
         UserGroup userGroup = UserGroup.builder()
@@ -60,7 +57,7 @@ class UserGroupMapperTest {
         userGroupMapper.mapRolesInUserList(userGroup, userGroupResponse);
 
         verify(roleMapper).roleToRoleResponse(Mockito.any());
-        assertSame(roleResponse, userGroupResponse.users().get(0).role());
+        assertSame(roleResponse, userGroupResponse.users().get(0).getRole());
     }
 }
 

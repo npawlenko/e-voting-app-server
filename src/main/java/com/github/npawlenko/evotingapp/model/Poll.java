@@ -1,5 +1,6 @@
 package com.github.npawlenko.evotingapp.model;
 
+import graphql.com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
@@ -44,11 +45,11 @@ public class Poll {
     @ManyToOne
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
-    @OneToMany(mappedBy = "poll")
-    private List<PollAnswer> pollAnswers;
-    @OneToMany(mappedBy = "poll")
-    private List<Vote> votes;
-    @ManyToOne
+    @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
+    private List<PollAnswer> pollAnswers = Lists.newArrayList();
+    @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
+    private List<Vote> votes = Lists.newArrayList();
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_group_id", referencedColumnName = "id")
     private UserGroup userGroup;
 }
