@@ -50,7 +50,7 @@ public class VoteService {
     }
 
     private static boolean isEligibleForVote(Poll poll, User loggedUser) {
-        return (poll.isPublic() || poll.getUserGroup().getUsers().contains(loggedUser));
+        return (poll.isPublic() || poll.getUserGroup().getUsers().contains(loggedUser) || poll.getCreator().equals(loggedUser));
     }
 
     public void deleteVote(Long voteId) {
@@ -68,11 +68,13 @@ public class VoteService {
         PollAnswer pollAnswer = pollAnswerRepository.findById(pollAnswerId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
         Poll poll = pollAnswer.getPoll();
-        if (poll.getClosesAt().isBefore(LocalDateTime.now()) || !voteToken.getPoll().equals(poll)) {
+        if (poll.getClosesAt().isBefore(LocalDateTime.now()) || !voteToken.getPoll().equals(poll) || voteOnPollByTokenExists(voteToken, poll)) {
             throw new ApiRequestException(FORBIDDEN);
         }
 
-        emailUtility.sendSimpleMessage(voteToken.getEmail(), "Potwierdzenie oddania głosu", "Twój głos został oddany");
+        emailUtility.sendSimpleMessage(voteToken.getEmail(),
+                "Potwierdzenie oddania głosu",
+                String.format("Twój głos w ankiecie \"%s\" na odpowiedź \"%s\" został oddany.", poll.getQuestion(), pollAnswer.getAnswer()));
 
         Vote vote = Vote.builder()
                 .poll(poll)
@@ -83,5 +85,9 @@ public class VoteService {
                 .build();
         Vote savedVote = voteRepository.save(vote);
         return voteMapper.voteToVoteResponse(savedVote);
+    }
+
+    public boolean voteOnPollByTokenExists(VoteToken voteToken, Poll poll) {
+        return voteRepository.findByNonSystemAccountEmailAndPoll(voteToken.getEmail(), poll).isPresent();
     }
 }

@@ -2,6 +2,8 @@ package com.github.npawlenko.evotingapp.poll.dto;
 
 import com.github.npawlenko.evotingapp.pollAnswer.dto.PollAnswerResponse;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
+import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupResponse;
+import com.github.npawlenko.evotingapp.vote.dto.VoteResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,5 +24,7 @@ public class PollResponse {
         private boolean isPublic;
         private UserResponse creator;
         private List<PollAnswerResponse> answers;
+        private List<UserResponse> systemUsers;
+        private List<VoteResponse> votes;
         private boolean votePlaced;
 }

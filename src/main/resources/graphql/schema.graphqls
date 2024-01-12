@@ -23,6 +23,7 @@ type Mutation {
     insert_poll(poll: poll_input!): Poll
     update_poll(poll_id: ID!, object: poll_input!): Poll
     delete_poll(poll_id: ID!): Boolean
+    close_poll(poll_id: ID!): Boolean
 
     insert_vote(poll_answer_id: ID!): Vote
     insert_vote_by_token(poll_answer_id: ID!, vote_token: String!): Vote
@@ -83,7 +84,7 @@ type Poll {
     isPublic: Boolean!
     creator: User
     answers: [PollAnswer]
-    userGroup: UserGroup
+    systemUsers: [User]
     votes: [Vote]
     votePlaced: Boolean!
 }

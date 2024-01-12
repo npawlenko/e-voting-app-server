@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "poll_answers")
 @Getter
@@ -30,4 +32,6 @@ public class PollAnswer {
     @ManyToOne
     @JoinColumn(name = "poll_id", referencedColumnName = "id")
     private Poll poll;
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votes;
 }

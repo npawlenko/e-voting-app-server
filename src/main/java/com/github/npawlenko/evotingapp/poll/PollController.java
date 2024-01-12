@@ -10,6 +10,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -53,14 +54,19 @@ public class PollController {
 
     @MutationMapping("update_poll")
     public PollResponse updatePoll(
-            @Argument("id") Long pollId,
+            @Argument("poll_id") Long pollId,
             @Valid @Argument("object") PollRequest pollRequest
     ) {
         return pollService.updatePoll(pollId, pollRequest);
     }
 
+    @MutationMapping("close_poll")
+    public void closePoll(@Argument("poll_id") Long pollId) {
+        pollService.closePoll(pollId);
+    }
+
     @MutationMapping("delete_poll")
-    public void deletePoll(@Argument("id") Long pollId) {
+    public void deletePoll(@Argument("poll_id") Long pollId) {
         pollService.deletePoll(pollId);
     }
 }

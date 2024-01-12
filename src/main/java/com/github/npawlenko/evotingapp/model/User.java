@@ -47,15 +47,17 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
-    @OneToMany(mappedBy = "creator")
+    @OneToMany(mappedBy = "creator", orphanRemoval = true)
     private List<Poll> polls;
-    @OneToMany(mappedBy = "voter")
+    @OneToMany(mappedBy = "voter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Token> tokens;
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<ResetToken> resetTokens;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserGroup> ownedGroups;
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<UserGroup> memberOfGroups;
 
     public String getFullName() {

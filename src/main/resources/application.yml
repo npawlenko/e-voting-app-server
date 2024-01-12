@@ -5,6 +5,8 @@ application:
   security:
     password-reset-token-expiration-seconds: 300 #5min
 spring:
+  jackson:
+    time-zone: Europe/Warsaw
   profiles:
     active: dev
   datasource:

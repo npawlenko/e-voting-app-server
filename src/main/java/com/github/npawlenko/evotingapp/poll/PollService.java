@@ -17,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,18 +39,27 @@ public class PollService {
     private final VoteTokenRepository voteTokenRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public List<PollResponse> accessibleForUserPolls(int pageSize, int pageNumber) {
         User user = authenticatedUserUtility.getLoggedUser();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return pollRepository.findAccessibleForUserPolls(user.getId(), pageable).stream().map(pollMapper::pollToPollResponse).toList();
+        return pollRepository.findAccessibleForUserPolls(user.getId(), pageable).stream()
+                .map(pollMapper::pollToPollResponse)
+                .sorted(Comparator.comparing(PollResponse::getCreatedAt).reversed())
+                .toList();
     }
 
+    @Transactional
     public List<PollResponse> userPolls(int pageSize, int pageNumber) {
         User user = authenticatedUserUtility.getLoggedUser();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return pollRepository.findPollByCreatorId(user.getId(), pageable).stream().map(pollMapper::pollToPollResponse).toList();
+        return pollRepository.findPollByCreatorId(user.getId(), pageable).stream()
+                .map(pollMapper::pollToPollResponse)
+                .sorted(Comparator.comparing(PollResponse::getCreatedAt).reversed())
+                .toList();
     }
 
+    @Transactional
     public PollResponse createPoll(PollRequest pollRequest) {
         User user = authenticatedUserUtility.getLoggedUser();
 
@@ -56,14 +67,7 @@ public class PollService {
         poll.setCreatedAt(LocalDateTime.now());
         poll.setClosesAt(pollRequest.getClosesAt());
         poll.setCreator(user);
-
-        UserGroup ug = new UserGroup();
-        List<User> users = userRepository.findAllById(pollRequest.getSystemUsers());
-        ug.setUsers(users);
-        ug.setPolls(List.of(poll));
-        ug.setOwner(user);
-        ug.setName("Unnamed");
-        poll.setUserGroup(ug);
+        createAndSetUserGroup(pollRequest, user, poll);
         pollRepository.save(poll);
 
         pollRequest.getNonSystemUsersEmails().forEach(email -> {
@@ -83,18 +87,40 @@ public class PollService {
     }
 
 
+    @Transactional
     public PollResponse updatePoll(Long pollId, PollRequest pollRequest) {
         User user = authenticatedUserUtility.getLoggedUser();
-        Poll pollBeforeUpdate = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(user, pollBeforeUpdate.getCreator());
+        Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
+        authorizationUtility.requireAdminOrOwnerPermission(user, poll.getCreator());
 
-        Poll poll = pollMapper.pollRequestToPoll(pollRequest);
-        poll.setCreator(pollBeforeUpdate.getCreator());
-        Poll savedPollAnswer = pollRepository.save(poll);
+        pollMapper.updatePoll(poll, pollRequest);
+        createAndSetUserGroup(pollRequest, user, poll);
+        pollRepository.save(poll);
 
-        return pollMapper.pollToPollResponse(savedPollAnswer);
+        return pollMapper.pollToPollResponse(poll);
     }
 
+    private void createAndSetUserGroup(PollRequest pollRequest, User user, Poll poll) {
+        UserGroup ug = new UserGroup();
+        List<User> users = userRepository.findAllById(pollRequest.getSystemUsers());
+        ug.setUsers(users);
+        ug.setPolls(List.of(poll));
+        ug.setOwner(user);
+        ug.setName("Unnamed");
+        poll.setUserGroup(ug);
+    }
+
+    @Transactional
+    public void closePoll(Long pollId) {
+        User user = authenticatedUserUtility.getLoggedUser();
+        Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
+        authorizationUtility.requireAdminOrOwnerPermission(user, poll.getCreator());
+
+        poll.setClosesAt(LocalDateTime.now());
+        pollRepository.save(poll);
+    }
+
+    @Transactional
     public void deletePoll(Long pollId) {
         User user = authenticatedUserUtility.getLoggedUser();
         Poll pollBeforeUpdate = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
@@ -103,6 +129,7 @@ public class PollService {
         pollRepository.deleteById(pollId);
     }
 
+    @Transactional
     public PollResponse findPollById(Long pollId) {
         User user = authenticatedUserUtility.getLoggedUser();
         Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
@@ -112,9 +139,12 @@ public class PollService {
         return pollMapper.pollToPollResponse(poll);
     }
 
+    @Transactional
     public PollResponse findPollByIdUsingToken(String token) {
+        PollResponse pollResponse = new PollResponse();
         VoteToken voteToken = voteTokenRepository.findByToken(token).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        return pollMapper.pollToPollResponse(voteToken.getPoll());
+        pollMapper.pollToPollResponseWithToken(voteToken.getPoll(), pollResponse, voteToken);
+        return pollResponse;
     }
 
     private boolean userInPollUserGroup(User user, Poll poll) {

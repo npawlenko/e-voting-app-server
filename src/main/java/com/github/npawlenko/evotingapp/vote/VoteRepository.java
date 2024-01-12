@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface VoteRepository extends JpaRepository<Vote, Long> {
     Optional<Vote> findByVoterAndPoll(User user, Poll poll);
+    Optional<Vote> findByNonSystemAccountEmailAndPoll(String nonSystemAccountEmail, Poll poll);
 }

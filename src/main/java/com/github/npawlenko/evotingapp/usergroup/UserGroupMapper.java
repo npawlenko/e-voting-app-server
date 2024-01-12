@@ -31,6 +31,7 @@ public abstract class UserGroupMapper {
     @Autowired
     protected RoleMapper roleMapper;
 
+
     public abstract UserGroupResponse userGroupToUserGroupResponse(UserGroup userGroup);
 
     @Mapping(target = "users", expression = "java( userRepository.findByUserIds(userGroupRequest.userIds()) )")
@@ -43,10 +44,10 @@ public abstract class UserGroupMapper {
         Iterator<User> userIterator = userGroup.getUsers().iterator();
         int usersLength = userGroup.getUsers().size();
         IntStream.range(0, usersLength).forEach(index -> {
-            UserResponse user = userGroupResponse.users().get(index);
+            UserResponse user = userGroupResponse.getUsers().get(index);
             User userSource = userIterator.next();
             RoleResponse roleResponse = roleMapper.roleToRoleResponse(userSource.getRole());
-            userGroupResponse.users().set(index, user.withRole(roleResponse));
+            userGroupResponse.getUsers().set(index, user.withRole(roleResponse));
         });
     }
 }

@@ -36,7 +36,7 @@ public class UserGroup {
     @JoinTable(
             name = "user_group_association",
             joinColumns = @JoinColumn(name = "group_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
     private List<User> users;
 }

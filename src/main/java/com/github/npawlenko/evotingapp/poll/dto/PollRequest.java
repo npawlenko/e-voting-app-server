@@ -22,6 +22,6 @@ public class PollRequest {
         private LocalDateTime closesAt;
         private List<String> nonSystemUsersEmails;
         private List<Long> systemUsers;
-        boolean isPublic;
+        private Boolean isPublic;
         private List<PollAnswerRequest> answers;
 }

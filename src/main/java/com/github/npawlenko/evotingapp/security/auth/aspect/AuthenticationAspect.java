@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -75,7 +76,6 @@ public class AuthenticationAspect {
             authenticateUser(request, userDetails);
         } catch (JwtException e) {
             log.error(e.getMessage());
-            e.printStackTrace();
             throw new ApiRequestException(TOKEN_INVALID);
         }
 
