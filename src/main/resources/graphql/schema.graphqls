@@ -5,7 +5,7 @@ type Query {
     user_polls(page_size: Int = 10, page_number: Int = 0): [Poll]
 
     poll(poll_id: ID!): Poll
-    poll_by_token(vote_token: String!): Poll
+    poll_by_token(poll_id: ID!, vote_token: String!): Poll
     poll_answer(id: ID!): [PollAnswer]
 
     user_group(id: ID!): UserGroup
@@ -52,6 +52,7 @@ input poll_input {
 }
 
 input poll_answer_input {
+    id: ID
     answer: String!
 }
 

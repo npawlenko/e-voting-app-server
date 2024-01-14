@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,6 +60,8 @@ public class AuthService {
 
     @Value("${application.security.password-reset-token-expiration-seconds}")
     private Long passwordResetTokenExpiration;
+    @Value("${application.base-url}")
+    private String baseUrl;
 
 
     public TokenResponse login(String email, String password) {
@@ -69,7 +72,7 @@ public class AuthService {
                             password
                     )
             );
-        } catch (InternalAuthenticationServiceException e) {
+        } catch (BadCredentialsException e) {
             throw new ApiRequestException(USER_CREDENTIALS_INVALID);
         }
 
@@ -238,7 +241,9 @@ public class AuthService {
         resetTokenRepository.save(resetToken);
         emailUtility.sendSimpleMessage(email,
                 "Resetowanie hasła",
-                String.format("Zresetuj hasło używając tokena %s", token));
+                String.format(
+                        "Zresetuj hasło przechodząc pod adres %s/auth/reset/%s",
+                        baseUrl, token));
     }
 
     private LocalDateTime instantToLocalDateTime(Instant instant) {

@@ -1,0 +1,1 @@
+alter table votes alter column voter_id drop not null;

@@ -54,7 +54,7 @@ class PollServiceTest {
      */
     @Test
     void testAccessibleForUserPolls_ReturnsEmptyList() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(new User()));
         when(pollRepository.findAccessibleForUserPolls(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>());
         assertTrue(pollService.accessibleForUserPolls(10, 0).isEmpty());
         verify(authenticatedUserUtility).getLoggedUser();
@@ -76,7 +76,7 @@ class PollServiceTest {
      */
     @Test
     void testAccessibleForUserPolls_ReturnsPollList() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(User.builder().id(1L).build());
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(User.builder().id(1L).build()));
         when(pollRepository.findAccessibleForUserPolls(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>() {{
             add(new Poll());
         }});
@@ -90,7 +90,7 @@ class PollServiceTest {
      */
     @Test
     void testUserPolls_ReturnsEmptyList() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(new User()));
         when(pollRepository.findPollByCreatorId(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>());
         assertTrue(pollService.userPolls(10, 0).isEmpty());
         verify(authenticatedUserUtility).getLoggedUser();
@@ -113,7 +113,7 @@ class PollServiceTest {
      */
     @Test
     void testUserPolls_ReturnsPollList() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(new User()));
         when(pollRepository.findPollByCreatorId(Mockito.<Long>any(), Mockito.any())).thenReturn(new ArrayList<>() {{
             add(new Poll());
         }});
@@ -127,8 +127,8 @@ class PollServiceTest {
      */
     @Test
     void testCreatePoll_CreatesPoll() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
-        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, false);
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(new User()));
+        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, null, null, false);
         when(pollMapper.pollToPollResponse(Mockito.any())).thenReturn(pollResponse);
         when(pollMapper.pollRequestToPoll(Mockito.any())).thenReturn(new Poll());
         when(pollRepository.save(Mockito.any())).thenReturn(new Poll());
@@ -155,9 +155,9 @@ class PollServiceTest {
      */
     @Test
     void testUpdatePoll_UpdatesPoll() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(new User()));
         doNothing().when(authorizationUtility).requireAdminOrOwnerPermission(Mockito.any(), Mockito.any());
-        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, false);
+        PollResponse pollResponse = new PollResponse(1L, null, null, null, true, null, null, null, null, false);
         when(pollMapper.pollToPollResponse(Mockito.any())).thenReturn(pollResponse);
         when(pollMapper.pollRequestToPoll(Mockito.any())).thenReturn(new Poll());
         when(pollRepository.save(Mockito.any())).thenReturn(new Poll());
@@ -188,7 +188,7 @@ class PollServiceTest {
      */
     @Test
     void testDeletePoll_DeletesPoll() {
-        when(authenticatedUserUtility.getLoggedUser()).thenReturn(new User());
+        when(authenticatedUserUtility.getLoggedUser()).thenReturn(Optional.of(new User()));
         doNothing().when(authorizationUtility).requireAdminOrOwnerPermission(Mockito.any(), Mockito.any());
         doNothing().when(pollRepository).deleteById(Mockito.<Long>any());
         when(pollRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(new Poll()));

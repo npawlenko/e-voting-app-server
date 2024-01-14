@@ -35,8 +35,8 @@ public class PollController {
 
     @PublicEndpoint
     @QueryMapping("poll_by_token")
-    public PollResponse findByPollByIdUsingToken(@Argument("vote_token") String token) {
-        return pollService.findPollByIdUsingToken(token);
+    public PollResponse findByPollByIdUsingToken(@Argument("poll_id") Long pollId, @Argument("vote_token") String token) {
+        return pollService.findPollByIdUsingToken(pollId, token);
     }
 
     @QueryMapping("user_polls")

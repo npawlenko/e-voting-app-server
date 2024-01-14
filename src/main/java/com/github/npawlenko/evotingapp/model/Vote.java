@@ -30,8 +30,6 @@ public class Vote {
     @Column(name = "casted_at")
     @PastOrPresent
     private LocalDateTime castedAt;
-    @Column(name = "from_system_account", columnDefinition = "tinyint(1) default 1")
-    private Boolean fromSystemAccount;
     @Column(name = "non_system_account_email")
     @Email
     private String nonSystemAccountEmail;

@@ -19,7 +19,7 @@ public class VoteController {
     }
 
     @PublicEndpoint
-    @MutationMapping("insert_vote_token")
+    @MutationMapping("insert_vote_by_token")
     public VoteResponse createVoteByToken(@Argument("poll_answer_id") Long pollAnswerId, @Argument("vote_token") String token) {
         return voteService.createVoteByToken(pollAnswerId, token);
     }

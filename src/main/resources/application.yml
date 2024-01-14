@@ -1,12 +1,11 @@
 application:
+  base-url: http://localhost:3000
   jwt:
     access-token-expiration-seconds: 900 #15min
     refresh-token-expiration-seconds: 604800 #7d
   security:
     password-reset-token-expiration-seconds: 300 #5min
 spring:
-  jackson:
-    time-zone: Europe/Warsaw
   profiles:
     active: dev
   datasource:

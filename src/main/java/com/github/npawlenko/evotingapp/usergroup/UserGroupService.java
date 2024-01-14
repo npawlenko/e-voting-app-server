@@ -1,6 +1,7 @@
 package com.github.npawlenko.evotingapp.usergroup;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
+import com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason;
 import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.model.UserGroup;
 import com.github.npawlenko.evotingapp.user.UserRepository;
@@ -27,17 +28,17 @@ public class UserGroupService {
     private final UserGroupMapper userGroupMapper;
 
     public UserGroupResponse findUserGroupById(Long userGroupId) {
-        User loggedUser = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(USER_NOT_LOGGED_IN));
         UserGroup userGroup = userGroupRepository.findById(userGroupId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(loggedUser, userGroup.getOwner());
+        authorizationUtility.requireAdminOrOwnerPermission(currentUser, userGroup.getOwner());
         return userGroupMapper.userGroupToUserGroupResponse(userGroup);
     }
 
     public UserGroupResponse createUserGroup(UserGroupRequest userGroupRequest) {
-        User loggedUser = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(USER_NOT_LOGGED_IN));
         UserGroup userGroup = userGroupMapper.userGroupRequestToUserGroup(userGroupRequest);
-        userGroup.setOwner(loggedUser);
+        userGroup.setOwner(currentUser);
         return userGroupMapper.userGroupToUserGroupResponse(userGroupRepository.save(userGroup));
     }
 
@@ -74,10 +75,10 @@ public class UserGroupService {
     }
 
     private UserGroup findUserGroupAndAuthorizeUser(Long userGroupId) {
-        User loggedUser = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(USER_NOT_LOGGED_IN));
         UserGroup userGroup = userGroupRepository.findById(userGroupId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(loggedUser, userGroup.getOwner());
+        authorizationUtility.requireAdminOrOwnerPermission(currentUser, userGroup.getOwner());
         return userGroup;
     }
 }

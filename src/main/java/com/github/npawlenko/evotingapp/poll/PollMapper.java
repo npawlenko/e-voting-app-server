@@ -1,9 +1,11 @@
 package com.github.npawlenko.evotingapp.poll;
 
 import com.github.npawlenko.evotingapp.model.Poll;
+import com.github.npawlenko.evotingapp.model.PollAnswer;
 import com.github.npawlenko.evotingapp.model.VoteToken;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
+import com.github.npawlenko.evotingapp.pollAnswer.PollAnswerRepository;
 import com.github.npawlenko.evotingapp.user.UserMapper;
 import com.github.npawlenko.evotingapp.usergroup.UserGroupMapper;
 import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
@@ -21,6 +23,8 @@ public abstract class PollMapper {
     private AuthenticatedUserUtility authenticatedUserUtility;
     @Autowired
     private VoteService voteService;
+    @Autowired
+    private PollAnswerRepository pollAnswerRepository;
 
     @Mapping(source = "pollAnswers", target = "answers")
     @Mapping(target = "systemUsers", source = "userGroup.users")
@@ -28,16 +32,28 @@ public abstract class PollMapper {
 
     @Mapping(source = "pollAnswers", target = "answers")
     @Mapping(target = "systemUsers", source = "userGroup.users")
-    public void pollToPollResponseWithToken(Poll poll, @MappingTarget PollResponse pollResponse, @Context VoteToken voteToken) {
+    public abstract PollResponse pollToPollResponseWithToken(Poll poll, @Context VoteToken voteToken);
+
+    @AfterMapping
+    public void afterPollResponseWithTokenMapping(Poll poll, @MappingTarget PollResponse pollResponse, @Context VoteToken voteToken) {
         pollResponse.setVotePlaced(voteService.voteOnPollByTokenExists(voteToken, poll));
     }
 
     @Mapping(target = "public", source = "isPublic")
+    @Mapping(target = "pollAnswers", source = "answers")
     public abstract void updatePoll(@MappingTarget Poll poll, PollRequest pollRequest);
 
     @AfterMapping
-    protected void mapRolesInUserList(Poll poll, @MappingTarget PollResponse pollResponse) {
-        boolean votePlaced = voteRepository.findByVoterAndPoll(authenticatedUserUtility.getLoggedUser(), poll).isPresent();
+    protected void mapVotePlacedWithToken(Poll poll, @MappingTarget PollResponse pollResponse) {
+        authenticatedUserUtility.getLoggedUser().ifPresent(currentUser -> {
+            boolean votePlaced = voteRepository.findByVoterAndPoll(currentUser, poll).isPresent();
+            pollResponse.setVotePlaced(votePlaced);
+        });
+    }
+
+    @AfterMapping
+    protected void mapVotePlacedWithToken(Poll poll, @MappingTarget PollResponse pollResponse, @Context VoteToken voteToken) {
+        boolean votePlaced = voteRepository.findByNonSystemAccountEmailAndPoll(voteToken.getEmail(), poll).isPresent();
         pollResponse.setVotePlaced(votePlaced);
     }
 

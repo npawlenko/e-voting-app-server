@@ -1,6 +1,7 @@
 package com.github.npawlenko.evotingapp.pollAnswer;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
+import com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason;
 import com.github.npawlenko.evotingapp.model.Poll;
 import com.github.npawlenko.evotingapp.model.PollAnswer;
 import com.github.npawlenko.evotingapp.model.User;
@@ -27,10 +28,10 @@ public class PollAnswerService {
     private final AuthorizationUtility authorizationUtility;
 
     public PollAnswerResponse createPollAnswer(Long pollId, PollAnswerRequest data) {
-        User user = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(user, poll.getCreator());
+        authorizationUtility.requireAdminOrOwnerPermission(currentUser, poll.getCreator());
 
         PollAnswer pollAnswer = pollAnswerMapper.pollAnswerRequestToPollAnswer(data);
         pollAnswer.setPoll(poll);
@@ -40,10 +41,10 @@ public class PollAnswerService {
     }
 
     public PollAnswerResponse updatePollAnswer(Long pollAnswerId, PollAnswerRequest data) {
-        User user = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
         PollAnswer pollAnswerBeforeUpdate = pollAnswerRepository.findById(pollAnswerId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(user, pollAnswerBeforeUpdate.getPoll().getCreator());
+        authorizationUtility.requireAdminOrOwnerPermission(currentUser, pollAnswerBeforeUpdate.getPoll().getCreator());
 
         PollAnswer pollAnswer = pollAnswerMapper.pollAnswerRequestToPollAnswer(data);
         pollAnswer.setPoll(pollAnswerBeforeUpdate.getPoll());
@@ -53,19 +54,19 @@ public class PollAnswerService {
     }
 
     public void deletePollAnswer(Long pollAnswerId) {
-        User user = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
         PollAnswer pollAnswer = pollAnswerRepository.findById(pollAnswerId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(user, pollAnswer.getPoll().getCreator());
+        authorizationUtility.requireAdminOrOwnerPermission(currentUser, pollAnswer.getPoll().getCreator());
 
         pollAnswerRepository.deleteById(pollAnswerId);
     }
 
     public List<PollAnswerResponse> findPollAnswerById(Long pollId) {
-        User user = authenticatedUserUtility.getLoggedUser();
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        authorizationUtility.requireAdminOrOwnerPermission(user, poll.getCreator());
+        authorizationUtility.requireAdminOrOwnerPermission(currentUser, poll.getCreator());
 
         return poll.getPollAnswers().stream()
                 .map(pollAnswerMapper::pollAnswerToPollAnswerResponse)
