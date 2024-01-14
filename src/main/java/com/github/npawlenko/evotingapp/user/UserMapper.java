@@ -1,21 +1,36 @@
 package com.github.npawlenko.evotingapp.user;
 
+import com.github.npawlenko.evotingapp.model.RoleType;
 import com.github.npawlenko.evotingapp.model.User;
+import com.github.npawlenko.evotingapp.user.dto.UserRequest;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
+import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
 
+    @Autowired
+    private AuthenticatedUserUtility authenticatedUserUtility;
+
     @Mapping(source = "role.role", target = "role.name")
     public abstract UserResponse userToUserResponse(User user);
 
+    public abstract void updateUser(@MappingTarget User user, UserRequest userRequest);
+
     @AfterMapping
-    private void afterMapping(@MappingTarget UserResponse userResponse, User user) {
-        userResponse.setEmail(anonymizeEmail(user.getEmail()));
+    protected void afterMapping(@MappingTarget UserResponse userResponse, User user) {
+        authenticatedUserUtility.getLoggedUser().ifPresentOrElse(currentUser -> {
+            if(!RoleType.ADMIN.equals(currentUser.getRole().getRole())) {
+                userResponse.setEmail(anonymizeEmail(user.getEmail()));
+            }
+        }, () -> {
+            userResponse.setEmail(anonymizeEmail(user.getEmail()));
+        });
     }
 
     private String anonymizeEmail(String email) {

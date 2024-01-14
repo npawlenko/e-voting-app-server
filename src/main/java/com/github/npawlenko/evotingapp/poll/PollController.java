@@ -60,6 +60,12 @@ public class PollController {
         return pollService.updatePoll(pollId, pollRequest);
     }
 
+    @QueryMapping("allPolls")
+    public List<PollResponse> getAllPolls(@Min(1) @Argument("page_size") int pageSize,
+                                          @Min(0) @Argument("page_number") int pageNumber) {
+        return pollService.findAllPolls(pageSize, pageNumber);
+    }
+
     @MutationMapping("close_poll")
     public void closePoll(@Argument("poll_id") Long pollId) {
         pollService.closePoll(pollId);
