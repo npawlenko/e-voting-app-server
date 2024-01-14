@@ -42,7 +42,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll(pageable).stream().map(userMapper::userToUserResponse).toList();
     }
 
-    public UserResponse editUser(Long id, UserRequest data) {
+    public void editUser(Long id, UserRequest data) {
         checkIsAdmin();
         User user = userRepository.findById(id).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
         if (RoleType.ADMIN.equals(user.getRole().getRole())) {
@@ -50,7 +50,6 @@ public class UserService implements UserDetailsService {
         }
         userMapper.updateUser(user, data);
         userRepository.save(user);
-        return userMapper.userToUserResponse(user);
     }
 
     public void deleteUser(Long id) {
@@ -60,6 +59,12 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Cannot delete admin account");
         }
         userRepository.delete(user);
+    }
+
+    public UserResponse getUser(Long id) {
+        checkIsAdmin();
+        User user = userRepository.findById(id).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
+        return userMapper.userToUserResponse(user);
     }
 
     private void checkIsAdmin() {

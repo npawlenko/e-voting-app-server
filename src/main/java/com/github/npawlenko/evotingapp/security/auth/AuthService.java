@@ -72,7 +72,7 @@ public class AuthService {
                             password
                     )
             );
-        } catch (BadCredentialsException e) {
+        } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
             throw new ApiRequestException(USER_CREDENTIALS_INVALID);
         }
 

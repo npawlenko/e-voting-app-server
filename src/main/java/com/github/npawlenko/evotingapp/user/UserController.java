@@ -30,10 +30,16 @@ public class UserController {
         return userService.getUsersPage(pageSize, pageNumber);
     }
 
-    @MutationMapping("edit_user")
-    public UserResponse editUser(@Argument Long id, @Argument UserRequest data) {
-        return userService.editUser(id, data);
+    @QueryMapping("user")
+    public UserResponse getUser(@Argument Long id) {
+        return userService.getUser(id);
     }
+
+    @MutationMapping("edit_user")
+    public void editUser(@Argument Long id, @Argument UserRequest data) {
+        userService.editUser(id, data);
+    }
+
 
     @MutationMapping("delete_user")
     public void deleteUser(@Argument Long id) {

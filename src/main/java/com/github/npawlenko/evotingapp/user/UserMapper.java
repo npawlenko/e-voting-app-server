@@ -20,6 +20,7 @@ public abstract class UserMapper {
     @Mapping(source = "role.role", target = "role.name")
     public abstract UserResponse userToUserResponse(User user);
 
+    @Mapping(target = "id", ignore = true)
     public abstract void updateUser(@MappingTarget User user, UserRequest userRequest);
 
     @AfterMapping
