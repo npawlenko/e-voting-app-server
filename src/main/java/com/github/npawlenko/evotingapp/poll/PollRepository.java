@@ -15,7 +15,8 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
             """
             SELECT DISTINCT p FROM Poll p
             LEFT JOIN FETCH p.userGroup ug
-            WHERE p.creator.id = :userId
+            WHERE p.isPublic
+                OR p.creator.id = :userId
                 OR ug.id IN (
                                 SELECT ug2.id FROM UserGroup ug2
                                 JOIN ug2.users u WHERE u.id = :userId
