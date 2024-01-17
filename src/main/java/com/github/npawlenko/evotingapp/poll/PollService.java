@@ -2,10 +2,7 @@ package com.github.npawlenko.evotingapp.poll;
 
 import com.github.npawlenko.evotingapp.exception.ApiRequestException;
 import com.github.npawlenko.evotingapp.exception.ApiRequestExceptionReason;
-import com.github.npawlenko.evotingapp.model.Poll;
-import com.github.npawlenko.evotingapp.model.User;
-import com.github.npawlenko.evotingapp.model.UserGroup;
-import com.github.npawlenko.evotingapp.model.VoteToken;
+import com.github.npawlenko.evotingapp.model.*;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
 import com.github.npawlenko.evotingapp.user.UserRepository;
@@ -140,7 +137,7 @@ public class PollService {
     public PollResponse findPollById(Long pollId) {
         User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
         Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        if (!poll.getCreator().equals(currentUser) && !userInPollUserGroup(currentUser, poll)) {
+        if (!poll.getCreator().equals(currentUser) && !userInPollUserGroup(currentUser, poll) && !RoleType.ADMIN.equals(currentUser.getRole().getRole())) {
             throw new ApiRequestException(FORBIDDEN);
         }
         return pollMapper.pollToPollResponse(poll);
@@ -158,5 +155,14 @@ public class PollService {
 
     private boolean userInPollUserGroup(User user, Poll poll) {
         return Optional.ofNullable(poll.getUserGroup()).map(ug -> ug.getUsers().contains(user)).orElse(false);
+    }
+
+    public List<PollResponse> findAllPolls(int pageSize, int pageNumber) {
+        User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
+        if(!RoleType.ADMIN.equals(currentUser.getRole().getRole())) {
+            throw new ApiRequestException(FORBIDDEN);
+        }
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return pollRepository.findAll(pageable).stream().map(pollMapper::pollToPollResponse).toList();
     }
 }

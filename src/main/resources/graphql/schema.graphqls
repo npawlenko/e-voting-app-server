@@ -7,9 +7,12 @@ type Query {
     poll(poll_id: ID!): Poll
     poll_by_token(poll_id: ID!, vote_token: String!): Poll
     poll_answer(id: ID!): [PollAnswer]
+    allPolls(page_size: Int = 10, page_number: Int = 0): [Poll]
 
     user_group(id: ID!): UserGroup
     users: [User]
+    users_page(page_size: Int = 10, page_number: Int = 0): [User]
+    user(id: ID!): User
 }
 
 type Mutation {
@@ -19,6 +22,9 @@ type Mutation {
     auth_refresh(refresh_token: String!): Token
     auth_reset_password(new_password: String!, reset_token: String!): Boolean
     auth_send_reset_password_link(email: String!): Boolean
+
+    edit_user(id: ID!, data: user_input!): Boolean
+    delete_user(id: ID!): Boolean
 
     insert_poll(poll: poll_input!): Poll
     update_poll(poll_id: ID!, object: poll_input!): Poll
@@ -66,6 +72,12 @@ input user_register_input {
 input user_group_input {
     name: String!
     user_ids: [ID!]
+}
+
+input user_input {
+    firstName: String!
+    lastName: String!
+    email: String!
 }
 # end of inputs
 
