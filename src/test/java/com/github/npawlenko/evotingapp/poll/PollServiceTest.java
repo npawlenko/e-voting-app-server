@@ -5,17 +5,24 @@ import com.github.npawlenko.evotingapp.model.Poll;
 import com.github.npawlenko.evotingapp.model.User;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
+import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
 import com.github.npawlenko.evotingapp.utils.AuthorizationUtility;
 import com.github.npawlenko.evotingapp.utils.EmailUtility;
 import com.github.npawlenko.evotingapp.voteToken.VoteTokenRepository;
+import jakarta.annotation.Resource;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,28 +33,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ContextConfiguration(classes = {PollService.class})
 @ExtendWith(SpringExtension.class)
 class PollServiceTest {
-    @MockBean
+    @Mock
     private AuthenticatedUserUtility authenticatedUserUtility;
 
-    @MockBean
+    @Mock
     private AuthorizationUtility authorizationUtility;
-    @MockBean
+    @Mock
+    private UserRepository userRepository;
+    @Mock
     private EmailUtility emailUtility;
 
-    @MockBean
+    @Mock
     private PollMapper pollMapper;
 
-    @MockBean
+    @Mock
     private VoteTokenRepository voteTokenRepository;
 
-    @MockBean
+    @Mock
     private PollRepository pollRepository;
 
-    @Autowired
+    @InjectMocks
     private PollService pollService;
+
+    @Before
+    public void setUp() throws Exception {
+        // Initialize mocks created above
+        MockitoAnnotations.openMocks(this);
+    }
 
     /**
      * Method under test: {@link PollService#accessibleForUserPolls(int, int)}
@@ -165,7 +179,7 @@ class PollServiceTest {
         assertSame(pollResponse, pollService.updatePoll(1L, new PollRequest("Question", LocalDateTime.MAX, new ArrayList<>(), new ArrayList<>(), true, new ArrayList<>())));
         verify(authenticatedUserUtility).getLoggedUser();
         verify(authorizationUtility).requireAdminOrOwnerPermission(Mockito.any(), Mockito.any());
-        verify(pollMapper).pollRequestToPoll(Mockito.any());
+        verify(pollMapper).updatePoll(Mockito.any(), Mockito.any());
         verify(pollMapper).pollToPollResponse(Mockito.any());
         verify(pollRepository).save(Mockito.any());
         verify(pollRepository).findById(Mockito.<Long>any());

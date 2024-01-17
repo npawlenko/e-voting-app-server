@@ -8,9 +8,13 @@ import com.github.npawlenko.evotingapp.user.UserRepository;
 import com.github.npawlenko.evotingapp.user.dto.UserResponse;
 import com.github.npawlenko.evotingapp.usergroup.dto.UserGroupResponse;
 import com.github.npawlenko.evotingapp.voteToken.VoteTokenRepository;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,19 +26,26 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(classes = {UserGroupMapperImpl.class})
 @ExtendWith(SpringExtension.class)
 class UserGroupMapperTest {
-    @MockBean
+    @Mock
     private RoleMapper roleMapper;
-    @MockBean
+    @Mock
     private VoteTokenRepository voteTokenRepository;
 
-    @Autowired
-    private UserGroupMapper userGroupMapper;
-
-    @MockBean
+    @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserGroupMapper userGroupMapperAbstract;
+
+    @InjectMocks
+    private UserGroupMapperImpl userGroupMapper;
+
+    @Before
+    public void setUp() throws Exception {
+        // Initialize mocks created above
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     void testMapRolesInUserList() {
@@ -57,7 +68,7 @@ class UserGroupMapperTest {
         userGroupMapper.mapRolesInUserList(userGroup, userGroupResponse);
 
         verify(roleMapper).roleToRoleResponse(Mockito.any());
-        assertSame(roleResponse, userGroupResponse.users().get(0).getRole());
+        assertSame(roleResponse, userGroupResponse.getUsers().get(0).getRole());
     }
 }
 
