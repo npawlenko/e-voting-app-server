@@ -137,7 +137,7 @@ public class PollService {
     public PollResponse findPollById(Long pollId) {
         User currentUser = authenticatedUserUtility.getLoggedUser().orElseThrow(() -> new ApiRequestException(ApiRequestExceptionReason.USER_NOT_LOGGED_IN));
         Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new ApiRequestException(NOT_FOUND));
-        if (!poll.getCreator().equals(currentUser) && !userInPollUserGroup(currentUser, poll) && !RoleType.ADMIN.equals(currentUser.getRole().getRole())) {
+        if (!poll.isPublic() && !poll.getCreator().equals(currentUser) && !userInPollUserGroup(currentUser, poll) && !RoleType.ADMIN.equals(currentUser.getRole().getRole())) {
             throw new ApiRequestException(FORBIDDEN);
         }
         return pollMapper.pollToPollResponse(poll);

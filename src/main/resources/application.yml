@@ -1,5 +1,7 @@
 application:
-  base-url: http://localhost:3000
+  base-url: ${BASE_URL}
+  path: ./
+  allow-origin: ${BASE_URL}
   jwt:
     access-token-expiration-seconds: 900 #15min
     refresh-token-expiration-seconds: 604800 #7d

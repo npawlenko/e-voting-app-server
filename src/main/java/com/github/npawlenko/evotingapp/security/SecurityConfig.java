@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,9 @@ public class SecurityConfig {
 
     private final RSAKeyStorage keyStorage;
 
+    @Value("${application.allow-origin}")
+    private String allowOrigin;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -59,7 +63,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(List.of("http://localhost:3000", "localhost:3000"));
+                    configuration.setAllowedOrigins(List.of(allowOrigin));
                     configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
                     configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
                     configuration.setAllowCredentials(true);

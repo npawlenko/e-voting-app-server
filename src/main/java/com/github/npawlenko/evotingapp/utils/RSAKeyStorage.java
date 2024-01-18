@@ -2,6 +2,7 @@ package com.github.npawlenko.evotingapp.utils;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -28,9 +29,12 @@ public class RSAKeyStorage {
     private final RSAPublicKey publicKey;
     private final RSAPrivateKey privateKey;
 
+    @Value("${application.path}")
+    private String parentPath;
+
     public RSAKeyStorage() {
-        File publicKeyFile = new File(PUBLIC_KEY_PATH);
-        File privateKeyFile = new File(PRIVATE_KEY_PATH);
+        File publicKeyFile = new File(parentPath, PUBLIC_KEY_PATH);
+        File privateKeyFile = new File(parentPath, PRIVATE_KEY_PATH);
         if (publicKeyFile.exists() && privateKeyFile.exists()) {
             log.info("Loading RSA key pair...");
             try {
@@ -59,7 +63,7 @@ public class RSAKeyStorage {
 
 
     private RSAPublicKey loadPublicKeyFromPemFile() throws Exception {
-        String pemContents = readKeyFromFile(PUBLIC_KEY_PATH);
+        String pemContents = readKeyFromFile(Paths.get(parentPath + File.separator + PUBLIC_KEY_PATH).toAbsolutePath());
         String publicKeyPEM = pemContents
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
@@ -72,7 +76,7 @@ public class RSAKeyStorage {
     }
 
     private RSAPrivateKey loadPrivateKeyFromPemFile() throws Exception {
-        String pemContents = readKeyFromFile(PRIVATE_KEY_PATH);
+        String pemContents = readKeyFromFile(Paths.get(parentPath + File.separator + PRIVATE_KEY_PATH).toAbsolutePath());
         String privateKeyPEM = pemContents
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
@@ -86,18 +90,21 @@ public class RSAKeyStorage {
 
     private void savePublicKeyToFile(byte[] key) throws IOException {
         String publicKeyPem = "-----BEGIN PUBLIC KEY-----\n" + Base64.getEncoder().encodeToString(key) + "\n-----END PUBLIC KEY-----";
-        Path path = Paths.get(PUBLIC_KEY_PATH);
-        Files.write(path, publicKeyPem.getBytes());
+        String path = parentPath + File.separator + PUBLIC_KEY_PATH;
+        Files.write(Paths.get(path).toAbsolutePath(), publicKeyPem.getBytes());
     }
 
     private void savePrivateKeyToFile(byte[] key) throws IOException {
         String privateKeyPem = "-----BEGIN PRIVATE KEY-----\n" + Base64.getEncoder().encodeToString(key) + "\n-----END PRIVATE KEY-----";
-        Path path = Paths.get(PRIVATE_KEY_PATH);
-        Files.write(path, privateKeyPem.getBytes());
+        String path = parentPath + File.separator + PRIVATE_KEY_PATH;
+        Files.write(Paths.get(path).toAbsolutePath(), privateKeyPem.getBytes());
     }
 
-    private String readKeyFromFile(String fileName) throws IOException {
-        Path path = Paths.get(fileName);
+    private String readKeyFromFile(Path path) throws IOException {
         return Files.readString(path);
+    }
+
+    private String getParentPath(String path) {
+        return this.parentPath;
     }
 }
