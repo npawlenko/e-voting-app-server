@@ -29,8 +29,7 @@ public class RSAKeyStorage {
     private final RSAPublicKey publicKey;
     private final RSAPrivateKey privateKey;
 
-    @Value("${application.path}")
-    private String parentPath;
+    private final String parentPath = ".";
 
     public RSAKeyStorage() {
         File publicKeyFile = new File(parentPath, PUBLIC_KEY_PATH);

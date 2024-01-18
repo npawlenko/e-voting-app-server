@@ -1,12 +1,20 @@
 application:
   base-url: ${BASE_URL}
-  path: ./
   allow-origin: ${BASE_URL}
   jwt:
     access-token-expiration-seconds: 900 #15min
     refresh-token-expiration-seconds: 604800 #7d
   security:
     password-reset-token-expiration-seconds: 300 #5min
+server:
+  port: 8443
+  security:
+    require-ssl: true
+  ssl:
+    key-store: ${SSL_KEYSTORE}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+    key-alias: tomcat
 spring:
   profiles:
     active: dev

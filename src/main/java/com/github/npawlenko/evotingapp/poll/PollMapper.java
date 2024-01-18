@@ -4,7 +4,6 @@ import com.github.npawlenko.evotingapp.model.Poll;
 import com.github.npawlenko.evotingapp.model.VoteToken;
 import com.github.npawlenko.evotingapp.poll.dto.PollRequest;
 import com.github.npawlenko.evotingapp.poll.dto.PollResponse;
-import com.github.npawlenko.evotingapp.pollAnswer.PollAnswerRepository;
 import com.github.npawlenko.evotingapp.user.UserMapper;
 import com.github.npawlenko.evotingapp.usergroup.UserGroupMapper;
 import com.github.npawlenko.evotingapp.utils.AuthenticatedUserUtility;
@@ -25,12 +24,12 @@ public abstract class PollMapper {
 
     @Mapping(source = "pollAnswers", target = "answers")
     @Mapping(target = "systemUsers", source = "userGroup.users")
-    @Mapping(target = "isPublic", source = "public")
+    @Mapping(target = "public", source = "public")
     public abstract PollResponse pollToPollResponse(Poll poll);
 
     @Mapping(source = "pollAnswers", target = "answers")
     @Mapping(target = "systemUsers", source = "userGroup.users")
-    @Mapping(target = "isPublic", source = "public")
+    @Mapping(target = "public", source = "public")
     public abstract PollResponse pollToPollResponseWithToken(Poll poll, @Context VoteToken voteToken);
 
     @AfterMapping
